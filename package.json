@@ -1,0 +1,31 @@
+{
+  "name": "seymour",
+  "version": "1.0.0",
+  "description": "",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postinstall": "tsc"
+  },
+  "keywords": [],
+  "author": "David Brownman <beamneocube@gmail.com> (https://davidbrownman.com)",
+  "license": "ISC",
+  "dependencies": {
+    "@slack/client": "^3.11.0",
+    "@types/got": "^7.1.2",
+    "@types/koa": "^2.0.39",
+    "@types/koa-bodyparser": "^3.0.23",
+    "@types/koa-route": "^3.2.0",
+    "@types/node": "^8.0.24",
+    "got": "^7.1.0",
+    "koa": "^2.3.0",
+    "koa-bodyparser": "^4.2.0",
+    "koa-route": "^3.2.0",
+    "typescript": "^2.4.2",
+    "url-parse": "github:xavdid/url-parse"
+  },
+  "devDependencies": {
+    "@types/dotenv": "^4.0.1",
+    "dotenv": "^4.0.0"
+  }
+}
