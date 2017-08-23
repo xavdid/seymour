@@ -10,6 +10,9 @@
   "keywords": [],
   "author": "David Brownman <beamneocube@gmail.com> (https://davidbrownman.com)",
   "license": "ISC",
+  "engines": {
+    "node": "8.4.0"
+  },
   "dependencies": {
     "@slack/client": "^3.11.0",
     "@types/got": "^7.1.2",
