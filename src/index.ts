@@ -3,12 +3,11 @@ import * as router from 'koa-route'
 import * as bodyParser from 'koa-bodyparser'
 import * as parser from 'url-parse'
 import * as handlers from './handlers'
+import * as dotenv from 'dotenv'
 
 const app = new Koa()
 if (app.env === 'development') {
-  import('dotenv').then(dotenv => {
-    dotenv.config()
-  })
+  dotenv.config()
 }
 
 app.use(bodyParser())
