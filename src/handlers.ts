@@ -52,7 +52,14 @@ const handlers: { [domain: string]: Handler } = {
     }
   },
   'macstories.net': { icon: 'https://i.imgur.com/0NqKUfZ.png' },
-  'boardgamegeek.com': { botName: 'BoardGameGeek Bot', icon: '' }
+  'boardgamegeek.com': {
+    botName: 'BoardGameGeek Bot',
+    icon: 'https://i.imgur.com/R3qwQEJ.png'
+  },
+  'escapistmagazine.com': {
+    botName: 'ZeroPunctuation Bot',
+    icon: 'https://i.imgur.com/KCtI84z.png'
+  }
 }
 
 export = handlers

@@ -4,6 +4,7 @@ import * as bodyParser from 'koa-bodyparser'
 import * as parser from 'url-parse'
 import * as handlers from './handlers'
 import * as dotenv from 'dotenv'
+import * as _ from 'lodash'
 
 const app = new Koa()
 if (app.env === 'development') {
@@ -77,13 +78,18 @@ const botNamer = (domain: string) => {
 }
 
 app.use(
-  router.get('/channels', async ctx => {
-    ctx.body = await web.channels.list()
+  router.get('/channels', async (ctx, next) => {
+    await next()
+    const channels = (await web.channels.list()).channels.filter(
+      (i: any) => !i.is_archived
+    )
+    ctx.body = channels.map((channel: any) => _.pick(channel, ['id', 'name']))
   })
 )
 
 app.use(
   router.post('/read', async (ctx, next) => {
+    await next()
     const b = ctx.request.body
     ctx.body = { name: b.name }
   })
@@ -91,6 +97,7 @@ app.use(
 
 app.use(
   router.post('/item', async (ctx, next) => {
+    await next()
     const body: ItemBody = ctx.request.body
     if (!(body.channel && body.url)) {
       ctx.status = 400
@@ -136,5 +143,12 @@ app.use(
     }
   })
 )
+
+// vdalidate API key
+app.use(async (ctx, next) => {
+  if (ctx.query.api_key !== process.env.API_KEY) {
+    ctx.throw(403, 'invalid or missing api key')
+  }
+})
 
 app.listen(process.env.PORT || 1234)
