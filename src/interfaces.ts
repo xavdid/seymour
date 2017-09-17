@@ -1,11 +1,11 @@
 // core
-interface ItemBody {
+export interface ItemBody {
   channel: string
   url: string
   attachments?: string
 }
 
-interface Handler {
+export interface Handler {
   icon: string | null // :emoji: or url
   identifier?: string
   botName?: string
@@ -13,7 +13,7 @@ interface Handler {
 }
 
 // specific responses
-interface xkcdResponse {
+export interface xkcdResponse {
   month: string
   num: number
   link: string

@@ -1,5 +1,6 @@
 import * as got from 'got'
 import BaseHandler from './base'
+import { xkcdResponse } from '../interfaces'
 
 export default class extends BaseHandler {
   constructor() {

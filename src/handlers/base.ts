@@ -1,4 +1,5 @@
 import { botNamer } from '../utils'
+import { Handler } from '../interfaces'
 
 export default class BaseHandler implements Handler {
   icon: string | null
