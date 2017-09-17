@@ -1,10 +1,9 @@
 import * as Koa from 'koa'
 import * as router from 'koa-route'
 import * as bodyParser from 'koa-bodyparser'
-import * as parser from 'url-parse'
-import * as handlers from './handlers'
 import * as dotenv from 'dotenv'
 import * as _ from 'lodash'
+import pickHanlder from './handlerFactory'
 
 const app = new Koa()
 if (app.env === 'development') {
@@ -13,11 +12,12 @@ if (app.env === 'development') {
 
 app.use(bodyParser())
 
-const token = process.env.SLACK_API_TOKEN
+// const token = process.env.SLACK_API_TOKEN
 
 const WebClient = require('@slack/client').WebClient
-const web = new WebClient(token)
+const slackClient = new WebClient(process.env.SLACK_API_TOKEN)
 
+// give json instructions
 app.use(
   router.get('/', async ctx => {
     ctx.body = {
@@ -49,44 +49,18 @@ app.use(
   })
 )
 
-interface ItemBody {
-  channel: string
-  url: string
-  attachments?: string
-}
-
-const capitalize = (word: string) => {
-  word = word.toLowerCase()
-  return word.charAt(0).toUpperCase() + word.slice(1)
-}
-
-const rootDomain = (url: string) => {
-  const parts = parser(url).host.split('.')
-  if (parts.length === 3) {
-    // skip subdomain
-    return [parts[1], parts[2]].join('.')
-  } else {
-    // probably just 2 parts, unlikely to be 4
-    return parts.join('.')
-  }
-}
-
-const botNamer = (domain: string) => {
-  const parts = domain.split('.')
-  // probably just 2 parts
-  return `${capitalize(parts[0])} Bot`
-}
-
+// list channels
 app.use(
   router.get('/channels', async (ctx, next) => {
     await next()
-    const channels = (await web.channels.list()).channels.filter(
+    const channels = (await slackClient.channels.list()).channels.filter(
       (i: any) => !i.is_archived
     )
     ctx.body = channels.map((channel: any) => _.pick(channel, ['id', 'name']))
   })
 )
 
+// mark item as read
 app.use(
   router.post('/read', async (ctx, next) => {
     await next()
@@ -95,59 +69,40 @@ app.use(
   })
 )
 
+// send item to slack
 app.use(
   router.post('/item', async (ctx, next) => {
     await next()
     const body: ItemBody = ctx.request.body
-    if (!(body.channel && body.url)) {
-      ctx.status = 400
-      ctx.body = {
-        messages: [
-          body.channel ? null : 'Missing `channel` param',
-          body.url ? null : 'Missing `url` param'
-        ].filter(i => i)
-      }
-      return
-    }
-    const domain = rootDomain(body.url)
-    const handler = handlers[domain]
-    let opts: any = {
-      unfurl_links: true,
-      unfurl_media: true
-    }
-    let text: string | null = body.url
 
-    if (handler) {
-      if (handler.formatter) {
-        opts.attachments = await handler.formatter(body.url)
-        text = null
-      }
+    const handler = pickHanlder(body.url)
 
-      if (handler.icon[0] === ':') {
-        opts.icon_emoji = handler.icon
-      } else {
-        opts.icon_url = handler.icon
-      }
-
-      opts.username = handler.botName
-    }
-
-    opts.username = opts.username || botNamer(domain)
-
-    try {
-      console.log(opts)
-      const res = await web.chat.postMessage(body.channel, text, opts)
-      ctx.body = { ok: true }
-    } catch (e) {
-      ctx.body = { ok: false }
-    }
+    ctx.body = handler.postToChannel(body.channel, body.url, slackClient)
   })
 )
 
 // vdalidate API key
 app.use(async (ctx, next) => {
+  await next()
   if (ctx.query.api_key !== process.env.API_KEY) {
     ctx.throw(403, 'invalid or missing api key')
+  }
+})
+
+// validate input
+app.use(async (ctx, next) => {
+  await next()
+  const body: ItemBody = ctx.request.body
+
+  if (!(body.channel && body.url)) {
+    ctx.throw(
+      400,
+      'missing params',
+      [
+        body.channel ? null : 'Missing `channel` param',
+        body.url ? null : 'Missing `url` param'
+      ].filter(i => i)
+    )
   }
 })
 
