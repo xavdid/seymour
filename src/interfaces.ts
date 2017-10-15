@@ -2,7 +2,13 @@
 export interface ItemBody {
   channel: string
   url: string
-  attachments?: string
+  data?: {
+    title?: string
+    image?: string // header image
+    // subtitle?: string
+    content?: string // truncated content of article
+    color?: string // hex string for sidebar color
+  }
 }
 
 export interface Handler {

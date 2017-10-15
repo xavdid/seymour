@@ -40,7 +40,13 @@ app.use(
             channel: 'slack channel id',
             text: '[optional] message',
             url: '[optional] url to a linked post',
-            attachments: '[optional] extra information about the post'
+            data: {
+              NOTE: 'data object is entirely optional',
+              title: '[optional] overwite the name of the link',
+              image: '[optional] provide a header image',
+              content: '[optional] truncated content of article',
+              color: '[optional] hex string for sidebar color'
+            }
           },
           route: '/item',
           method: 'POST'
