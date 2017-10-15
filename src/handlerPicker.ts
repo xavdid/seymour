@@ -4,22 +4,26 @@ import { rootDomain } from './utils'
 import * as _ from 'lodash'
 
 const handlers: { [x: string]: BaseHandler[] } = {
-  'xkcd.com': [new xkcdHandler()],
-  'macstories.net': [new BaseHandler('https://i.imgur.com/0NqKUfZ.png')],
   'boardgamegeek.com': [
     new BaseHandler('https://i.imgur.com/R3qwQEJ.png', 'BoardGameGeek Bot')
   ],
   'escapistmagazine.com': [
     new BaseHandler('https://i.imgur.com/KCtI84z.png', 'ZeroPunctuation Bot')
   ],
+  'factorio.com': [
+    new BaseHandler('https://i.imgur.com/MGVDlo1.png')
+  ],
   'kickstarter.com': [
     new BaseHandler(
       'https://www.kickstarter.com/download/kickstarter-logo-k-color.png'
     )
   ],
+  'macstories.net': [new BaseHandler('https://i.imgur.com/0NqKUfZ.png')],
   'mailchi.mp': [
-    new BaseHandler('https://i.imgur.com/v8SJ8jz.png', 'Club Macstories Bot')
+    new BaseHandler(null), // other mailchimp stuff shouldn't automatically be macstories
+    new BaseHandler('https://i.imgur.com/v8SJ8jz.png', 'Club Macstories Bot', 'club_macstories')
   ],
+  'xkcd.com': [new xkcdHandler()],
   'youtube.com': [
     new BaseHandler('https://i.imgur.com/CnVgbNY.png'),
     new BaseHandler(

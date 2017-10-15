@@ -12,6 +12,8 @@ export default class BaseHandler implements Handler {
     this.identifier = identifier
   }
 
+  // this gets subclassed
+  // should return json string of slack attachments
   formatter(url: string) {
     return Promise.resolve('')
   }
