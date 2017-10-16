@@ -112,7 +112,7 @@ app.use(async (ctx, next) => {
   await next()
   const body: ItemBody = ctx.request.body
 
-  if (!(body.channel && body.url)) {
+  if (ctx.method === 'POST' && !(body.channel && body.url)) {
     ctx.throw(
       400,
       'missing params',
