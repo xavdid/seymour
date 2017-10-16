@@ -34,8 +34,15 @@
   },
   "devDependencies": {
     "@types/tape": "^4.2.30",
+    "prettier": "^1.7.4",
     "tap-spec": "^4.1.1",
     "tape": "^4.8.0",
-    "ts-node": "^3.3.0"
+    "ts-node": "^3.3.0",
+    "tslint": "^5.7.0",
+    "tslint-config-prettier": "^1.5.0"
+  },
+  "prettier": {
+    "semi": false,
+    "singleQuote": true
   }
 }
