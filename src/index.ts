@@ -17,6 +17,18 @@ app.use(bodyParser())
 const WebClient = require('@slack/client').WebClient
 const slackClient = new WebClient(process.env.SLACK_API_TOKEN)
 
+// top level error handler
+app.use(async (ctx, next) => {
+  try {
+    await next()
+  } catch (e) {
+    ctx.status = e.status || 500
+    ctx.body = {
+      message: e.message
+    }
+  }
+})
+
 // give json instructions
 app.use(
   router.get('/', async ctx => {
@@ -81,20 +93,16 @@ app.use(
     await next()
     const body: ItemBody = ctx.request.body
 
-    try {
-      const handler = pickHanlder(body.url, body.identifier)
+    const handler = pickHanlder(body.url, body.identifier)
 
-      ctx.body = handler.postToChannel(
-        body.channel,
-        body.url,
-        body.data,
-        slackClient
-      )
-      if (!ctx.body.ok) {
-        ctx.status = 500
-      }
-    } catch {
-      ctx.status = 400
+    ctx.body = await handler.postToChannel(
+      body.channel,
+      body.url,
+      slackClient,
+      body.data
+    )
+    if (!ctx.body.ok) {
+      ctx.status = 500
     }
   })
 )
@@ -115,11 +123,16 @@ app.use(async (ctx, next) => {
   if (ctx.method === 'POST' && !(body.channel && body.url)) {
     ctx.throw(
       400,
-      'missing params',
-      [
-        body.channel ? null : 'Missing `channel` param',
-        body.url ? null : 'Missing `url` param'
-      ].filter(i => i)
+      `missing params: ${[
+        body.channel ? null : 'channel',
+        body.url ? null : 'url'
+      ].filter(i => i)}`
+    )
+  }
+  if (ctx.method === 'POST' && body.url.includes('|')) {
+    ctx.throw(
+      400,
+      'Bars in url no longer supported, pass identifier separately'
     )
   }
 })

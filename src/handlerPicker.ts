@@ -41,11 +41,6 @@ export const identifiers = _.flatten(_.values(handlers))
   .map(h => h.identifier) as string[] // missing values are filtered
 
 export default function(url: string, identifier?: string) {
-  if (url.includes('|')) {
-    throw new Error(
-      'Bars in url no longer supported, pass identifier separately'
-    )
-  }
   const domainHandlers = handlers[rootDomain(url)]
   if (domainHandlers) {
     if (domainHandlers.length > 1) {

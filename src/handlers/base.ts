@@ -29,7 +29,7 @@ export default class BaseHandler implements Handler {
     ])
   }
 
-  async slackOpts(url: string, manualData: DataBody = {}) {
+  async slackOpts(url: string, manualData?: DataBody) {
     let opts: any = {
       unfurl_links: true,
       unfurl_media: true
@@ -47,6 +47,7 @@ export default class BaseHandler implements Handler {
 
     let text: string | null = url
     const attachments = await this.formatter(url) // merge overwrite objects in here somewhere
+
     if (manualData) {
       opts.attachments = this.processManual(url, manualData) // process input
     } else if (attachments) {
@@ -63,8 +64,8 @@ export default class BaseHandler implements Handler {
   async postToChannel(
     channel: string,
     url: string,
-    manualData: DataBody = {},
-    slackClient: any
+    slackClient: any,
+    manualData?: DataBody
   ) {
     // do things
     const [text, opts] = await this.slackOpts(url, manualData)
