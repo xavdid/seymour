@@ -2,9 +2,11 @@ import * as test from 'tape'
 
 import baseHandler from '../handlers/base'
 import xkcdHandler from '../handlers/xkcd'
-import picker from '../handlerPicker'
+import picker, { identifiers } from '../handlerPicker'
 
 import { rootDomain, botNamer } from '../utils'
+
+// need to test koa itself
 
 test('handlers', t => {
   test('kickstarter handler', t => {
@@ -42,8 +44,8 @@ test('handlers', t => {
   })
 
   test('crashcourse youtube handler', t => {
-    const url = 'https://www.youtube.com/watch?v=eeqb_vTkGeM|crash_course'
-    const basicYoutube = picker(url)
+    const url = 'https://www.youtube.com/watch?v=eeqb_vTkGeM'
+    const basicYoutube = picker(url, 'crash_course')
     basicYoutube.slackOpts(url).then(([text, opts]) => {
       t.true(opts.username.includes('Crash'))
       t.end()
@@ -51,12 +53,19 @@ test('handlers', t => {
   })
 
   test('club macstories handler', t => {
-    const url = 'https://mailchi.mp/macstories/ywfp76wxh2sv'
-    const basicYoutube = picker(url)
-    basicYoutube.slackOpts(url).then(([text, opts]) => {
+    const url = 'https://mailchi.mp/macstories/ywfp76wxh2s'
+    const macstories = picker(url, 'club_macstories')
+    macstories.slackOpts(url).then(([text, opts]) => {
       t.true(opts.username.includes('Club'))
       t.end()
     })
+  })
+
+  test('throw error for old urls', t => {
+    t.throws(() =>
+      picker('https://mailchi.mp/macstories/ywfp76wxh2s|club_macstories')
+    )
+    t.end()
   })
 
   t.end()
@@ -70,11 +79,6 @@ test('utils', t => {
   )
 
   t.assert(rootDomain('https://blah.thing.com/blah/id/3') === 'thing.com')
-
-  t.assert(
-    botNamer(
-      'https://www.kickstarter.com/projects/882053899/the-name-of-the-wind-art-deck/posts/1990046'
-    ) === 'Kickstarter Bot'
-  )
+  t.assert(identifiers.length > 1)
   t.end()
 })

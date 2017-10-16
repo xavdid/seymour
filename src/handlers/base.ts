@@ -1,12 +1,11 @@
 import { botNamer } from '../utils'
-import { Handler } from '../interfaces'
 
 export default class BaseHandler implements Handler {
-  icon: string | null
+  icon?: string
   identifier?: string
   botName?: string
 
-  constructor(icon: string | null, botName?: string, identifier?: string) {
+  constructor(icon?: string, botName?: string, identifier?: string) {
     this.icon = icon
     this.botName = botName
     this.identifier = identifier
@@ -18,7 +17,19 @@ export default class BaseHandler implements Handler {
     return Promise.resolve('')
   }
 
-  async slackOpts(url: string) {
+  processManual(url: string, data: DataBody) {
+    return JSON.stringify([
+      {
+        title: data.title,
+        text: data.text,
+        title_link: url,
+        image_url: data.image,
+        color: data.color
+      }
+    ])
+  }
+
+  async slackOpts(url: string, manualData: DataBody = {}) {
     let opts: any = {
       unfurl_links: true,
       unfurl_media: true
@@ -35,18 +46,28 @@ export default class BaseHandler implements Handler {
     opts.username = this.botName || botNamer(url)
 
     let text: string | null = url
-    const attachments = await this.formatter(url)
-    if (attachments) {
+    const attachments = await this.formatter(url) // merge overwrite objects in here somewhere
+    if (manualData) {
+      opts.attachments = this.processManual(url, manualData) // process input
+    } else if (attachments) {
       opts.attachments = attachments
+    }
+
+    if (opts.attachments) {
       text = null
     }
 
     return [text, opts]
   }
 
-  async postToChannel(channel: string, url: string, slackClient: any) {
+  async postToChannel(
+    channel: string,
+    url: string,
+    manualData: DataBody = {},
+    slackClient: any
+  ) {
     // do things
-    const [text, opts] = await this.slackOpts(url)
+    const [text, opts] = await this.slackOpts(url, manualData)
     try {
       const res = await slackClient.chat.postMessage(channel, text, opts)
       return { ok: true }

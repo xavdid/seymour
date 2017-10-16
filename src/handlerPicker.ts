@@ -10,9 +10,7 @@ const handlers: { [x: string]: BaseHandler[] } = {
   'escapistmagazine.com': [
     new BaseHandler('https://i.imgur.com/KCtI84z.png', 'ZeroPunctuation Bot')
   ],
-  'factorio.com': [
-    new BaseHandler('https://i.imgur.com/MGVDlo1.png')
-  ],
+  'factorio.com': [new BaseHandler('https://i.imgur.com/MGVDlo1.png')],
   'kickstarter.com': [
     new BaseHandler(
       'https://www.kickstarter.com/download/kickstarter-logo-k-color.png'
@@ -20,8 +18,12 @@ const handlers: { [x: string]: BaseHandler[] } = {
   ],
   'macstories.net': [new BaseHandler('https://i.imgur.com/0NqKUfZ.png')],
   'mailchi.mp': [
-    new BaseHandler(null), // other mailchimp stuff shouldn't automatically be macstories
-    new BaseHandler('https://i.imgur.com/v8SJ8jz.png', 'Club Macstories Bot', 'club_macstories')
+    new BaseHandler(), // other mailchimp stuff shouldn't automatically be macstories
+    new BaseHandler(
+      'https://i.imgur.com/v8SJ8jz.png',
+      'Club Macstories Bot',
+      'club_macstories'
+    )
   ],
   'xkcd.com': [new xkcdHandler()],
   'youtube.com': [
@@ -34,8 +36,16 @@ const handlers: { [x: string]: BaseHandler[] } = {
   ]
 }
 
-export default function(urlMaybeWithID: string) {
-  const [url, identifier] = urlMaybeWithID.split('|')
+export const identifiers = _.flatten(_.values(handlers))
+  .filter(h => h.identifier)
+  .map(h => h.identifier) as string[] // missing values are filtered
+
+export default function(url: string, identifier?: string) {
+  if (url.includes('|')) {
+    throw new Error(
+      'Bars in url no longer supported, pass identifier separately'
+    )
+  }
   const domainHandlers = handlers[rootDomain(url)]
   if (domainHandlers) {
     if (domainHandlers.length > 1) {
@@ -50,6 +60,6 @@ export default function(urlMaybeWithID: string) {
     }
   } else {
     // default fallback
-    return new BaseHandler(null)
+    return new BaseHandler()
   }
 }

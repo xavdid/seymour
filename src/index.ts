@@ -4,7 +4,6 @@ import * as bodyParser from 'koa-bodyparser'
 import * as dotenv from 'dotenv'
 import * as _ from 'lodash'
 import pickHanlder from './handlerPicker'
-import { ItemBody } from './interfaces'
 
 const app = new Koa()
 if (app.env === 'development') {
@@ -82,11 +81,20 @@ app.use(
     await next()
     const body: ItemBody = ctx.request.body
 
-    const handler = pickHanlder(body.url)
+    try {
+      const handler = pickHanlder(body.url, body.identifier)
 
-    ctx.body = handler.postToChannel(body.channel, body.url, slackClient)
-    if (!ctx.body.ok) {
-      ctx.status = 500
+      ctx.body = handler.postToChannel(
+        body.channel,
+        body.url,
+        body.data,
+        slackClient
+      )
+      if (!ctx.body.ok) {
+        ctx.status = 500
+      }
+    } catch {
+      ctx.status = 400
     }
   })
 )
