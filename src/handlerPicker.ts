@@ -4,6 +4,9 @@ import { rootDomain } from './utils'
 import * as _ from 'lodash'
 
 const handlers: { [x: string]: BaseHandler[] } = {
+  'appshopper.com': [
+    new BaseHandler('https://i.imgur.com/gJz8r3f.png', 'AppShopper Bot')
+  ],
   'boardgamegeek.com': [
     new BaseHandler('https://i.imgur.com/R3qwQEJ.png', 'BoardGameGeek Bot')
   ],
@@ -24,6 +27,11 @@ const handlers: { [x: string]: BaseHandler[] } = {
       'Club Macstories Bot',
       'club_macstories'
     )
+  ],
+  // reddit has an api, could do a subreddit handler
+  'reddit.com': [
+    new BaseHandler('https://i.imgur.com/JBSDcz8.png'),
+    new BaseHandler('https://i.imgur.com/48nSd44.png', 'CFB Bot', 'cfb')
   ],
   'xkcd.com': [new xkcdHandler()],
   'youtube.com': [
