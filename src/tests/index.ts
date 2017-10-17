@@ -61,13 +61,6 @@ test('handlers', t => {
     })
   })
 
-  test('throw error for old urls', t => {
-    t.throws(() =>
-      picker('https://mailchi.mp/macstories/ywfp76wxh2s|club_macstories')
-    )
-    t.end()
-  })
-
   t.end()
 })
 

@@ -11,7 +11,7 @@ export default class extends BaseHandler {
     const xkcd: xkcdResponse = JSON.parse(
       (await got.get(`https://xkcd.com/${comicNum}/info.0.json`)).body
     )
-    return JSON.stringify([
+    return [
       {
         title: xkcd.safe_title,
         title_link: `https://xkcd.com/${xkcd.num}/`,
@@ -23,6 +23,6 @@ export default class extends BaseHandler {
         fallback: `xkcd comic #${xkcd.num} alt text`,
         footer: xkcd.alt
       }
-    ])
+    ]
   }
 }

@@ -1,11 +1,11 @@
 import * as parser from 'url-parse'
 
-const capitalize = (word: string) => {
+export const capitalize = (word: string) => {
   word = word.toLowerCase()
   return word.charAt(0).toUpperCase() + word.slice(1)
 }
 
-const rootDomain = (url: string) => {
+export const rootDomain = (url: string) => {
   const parts = parser(url).host.split('.')
   if (parts.length === 3) {
     // skip subdomain
@@ -16,11 +16,11 @@ const rootDomain = (url: string) => {
   }
 }
 
-const botNamer = (url: string) => {
+export const botNamer = (url: string) => {
   const domain = rootDomain(url)
   const parts = domain.split('.')
   // probably just 2 parts
   return `${capitalize(parts[0])} Bot`
 }
 
-export { capitalize, rootDomain, botNamer }
+export const COLOR = '#FEDE00'

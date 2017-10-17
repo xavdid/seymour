@@ -1,4 +1,4 @@
-import { botNamer } from '../utils'
+import { botNamer, COLOR } from '../utils'
 
 export default class BaseHandler implements Handler {
   icon?: string
@@ -14,11 +14,11 @@ export default class BaseHandler implements Handler {
   // this gets subclassed
   // should return json string of slack attachments
   formatter(url: string) {
-    return Promise.resolve('')
+    return Promise.resolve(new Array())
   }
 
   processManual(url: string, data: DataBody) {
-    return JSON.stringify([
+    return [
       {
         title: data.title,
         text: data.text,
@@ -26,7 +26,7 @@ export default class BaseHandler implements Handler {
         image_url: data.image,
         color: data.color
       }
-    ])
+    ]
   }
 
   async slackOpts(url: string, manualData?: DataBody) {
@@ -46,17 +46,36 @@ export default class BaseHandler implements Handler {
     opts.username = this.botName || botNamer(url)
 
     let text: string | null = url
-    const attachments = await this.formatter(url) // merge overwrite objects in here somewhere
 
     if (manualData) {
       opts.attachments = this.processManual(url, manualData) // process input
-    } else if (attachments) {
-      opts.attachments = attachments
+    } else {
+      opts.attachments = await this.formatter(url) // merge overwrite objects in here somewhere
     }
 
-    if (opts.attachments) {
+    if (opts.attachments.length) {
       text = null
     }
+
+    // add button, stringify
+    opts.attachments = JSON.stringify(
+      opts.attachments.concat([
+        {
+          fallback: 'never seen',
+          callback_id: 'comic_1234_xyz', // this doesn't matter?
+          color: COLOR,
+          attachment_type: 'default',
+          actions: [
+            {
+              name: 'read',
+              text: 'Mark as Read',
+              type: 'button',
+              value: 'read2'
+            }
+          ]
+        }
+      ])
+    )
 
     return [text, opts]
   }

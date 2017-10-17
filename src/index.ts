@@ -4,6 +4,7 @@ import * as bodyParser from 'koa-bodyparser'
 import * as dotenv from 'dotenv'
 import * as _ from 'lodash'
 import pickHanlder from './handlerPicker'
+import { validateApiKey, validateInput } from './middlewares'
 
 const app = new Koa()
 if (app.env === 'development') {
@@ -11,8 +12,6 @@ if (app.env === 'development') {
 }
 
 app.use(bodyParser())
-
-// const token = process.env.SLACK_API_TOKEN
 
 const WebClient = require('@slack/client').WebClient
 const slackClient = new WebClient(process.env.SLACK_API_TOKEN)
@@ -55,7 +54,7 @@ app.use(
               NOTE: 'data object is entirely optional',
               title: '[optional] overwite the name of the link',
               image: '[optional] provide a header image',
-              content: '[optional] truncated content of article',
+              text: '[optional] truncated content of article',
               color: '[optional] hex string for sidebar color'
             }
           },
@@ -71,6 +70,8 @@ app.use(
 app.use(
   router.get('/channels', async (ctx, next) => {
     await next()
+    validateApiKey(ctx)
+
     const channels = (await slackClient.channels.list()).channels.filter(
       (i: any) => !i.is_archived
     )
@@ -82,8 +83,12 @@ app.use(
 app.use(
   router.post('/read', async (ctx, next) => {
     await next()
-    const b = ctx.request.body
-    ctx.body = { name: b.name }
+    ctx.status = 200
+    // returned json overwrites the original message
+    // per step 4 here: https://api.slack.com/interactive-messages#lifecycle_of_a_typical_interactive_message_flow
+    ctx.body = {
+      text: '_marked as read_'
+    }
   })
 )
 
@@ -91,9 +96,14 @@ app.use(
 app.use(
   router.post('/item', async (ctx, next) => {
     await next()
-    const body: ItemBody = ctx.request.body
 
+    const body: ItemBody = ctx.request.body
+    validateApiKey(ctx)
+    validateInput(ctx, body)
+
+    console.log(body.url, body.identifier)
     const handler = pickHanlder(body.url, body.identifier)
+    console.log(handler)
 
     ctx.body = await handler.postToChannel(
       body.channel,
@@ -107,34 +117,6 @@ app.use(
   })
 )
 
-// vdalidate API key
-app.use(async (ctx, next) => {
-  await next()
-  if (ctx.query.api_key !== process.env.API_KEY) {
-    ctx.throw(403, 'invalid or missing api key')
-  }
+const listener = app.listen(process.env.PORT || 1234, () => {
+  console.log(`app is listening on http://localhost:${listener.address().port}`)
 })
-
-// validate input
-app.use(async (ctx, next) => {
-  await next()
-  const body: ItemBody = ctx.request.body
-
-  if (ctx.method === 'POST' && !(body.channel && body.url)) {
-    ctx.throw(
-      400,
-      `missing params: ${[
-        body.channel ? null : 'channel',
-        body.url ? null : 'url'
-      ].filter(i => i)}`
-    )
-  }
-  if (ctx.method === 'POST' && body.url.includes('|')) {
-    ctx.throw(
-      400,
-      'Bars in url no longer supported, pass identifier separately'
-    )
-  }
-})
-
-app.listen(process.env.PORT || 1234)

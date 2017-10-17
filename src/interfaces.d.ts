@@ -17,7 +17,7 @@ interface Handler {
   icon?: string // :emoji: or url
   identifier?: string
   botName?: string
-  formatter(url: string): Promise<string> // stringified attachment array
+  formatter(url: string): Promise<any[]> // array of slack attachments
 }
 
 // specific responses

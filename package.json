@@ -6,6 +6,7 @@
   "scripts": {
     "test": "./node_modules/.bin/ts-node src/tests/index.ts | tap-spec",
     "start": "node lib/index.js",
+    "watch": "concurrently \"tsc -w\" \"nodemon\"",
     "postinstall": "tsc"
   },
   "keywords": [],
@@ -34,6 +35,8 @@
   },
   "devDependencies": {
     "@types/tape": "^4.2.30",
+    "concurrently": "^3.5.0",
+    "nodemon": "^1.12.1",
     "prettier": "^1.7.4",
     "tap-spec": "^4.1.1",
     "tape": "^4.8.0",
