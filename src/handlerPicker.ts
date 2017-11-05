@@ -10,10 +10,21 @@ const handlers: { [x: string]: BaseHandler[] } = {
   'boardgamegeek.com': [
     new BaseHandler('https://i.imgur.com/R3qwQEJ.png', 'BoardGameGeek Bot')
   ],
+  'codinghorror.net': [
+    new BaseHandler('https://i.imgur.com/8Dm4XWr.png', 'CodingHorror Bot')
+  ],
   'escapistmagazine.com': [
     new BaseHandler('https://i.imgur.com/KCtI84z.png', 'ZeroPunctuation Bot')
   ],
   'factorio.com': [new BaseHandler('https://i.imgur.com/MGVDlo1.png')],
+  'instagram.com': [
+    new BaseHandler(),
+    new BaseHandler(
+      'https://i.imgur.com/gLFXkfZ.png',
+      'CatanaComics Bot',
+      'catanacomics'
+    )
+  ],
   'kickstarter.com': [
     new BaseHandler(
       'https://www.kickstarter.com/download/kickstarter-logo-k-color.png'

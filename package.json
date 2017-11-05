@@ -4,16 +4,17 @@
   "description": "",
   "main": "lib/index.js",
   "scripts": {
-    "test": "./node_modules/.bin/ts-node src/tests/index.ts | tap-spec",
+    "test": "ts-node src/tests/index.ts | tap-spec",
     "start": "node lib/index.js",
-    "watch": "concurrently \"tsc -w\" \"nodemon\"",
+    "dev": "concurrently \"tsc -w\" \"nodemon -w lib\"",
     "postinstall": "tsc"
   },
   "keywords": [],
-  "author": "David Brownman <beamneocube@gmail.com> (https://davidbrownman.com)",
+  "author":
+    "David Brownman <beamneocube@gmail.com> (https://davidbrownman.com)",
   "license": "ISC",
   "engines": {
-    "node": "8.4.0"
+    "node": "8.9.0"
   },
   "dependencies": {
     "@slack/client": "^3.11.0",
