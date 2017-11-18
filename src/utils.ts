@@ -1,4 +1,5 @@
 import * as parser from 'url-parse'
+import * as got from 'got'
 
 export const capitalize = (word: string) => {
   word = word.toLowerCase()
@@ -7,13 +8,11 @@ export const capitalize = (word: string) => {
 
 export const rootDomain = (url: string) => {
   const parts = parser(url).host.split('.')
-  if (parts.length === 3) {
-    // skip subdomain
-    return [parts[1], parts[2]].join('.')
-  } else {
-    // probably just 2 parts, unlikely to be 4
-    return parts.join('.')
+  while (parts.length > 2) {
+    parts.shift()
   }
+
+  return parts.join('.')
 }
 
 export const botNamer = (url: string) => {
@@ -21,6 +20,15 @@ export const botNamer = (url: string) => {
   const parts = domain.split('.')
   // probably just 2 parts
   return `${capitalize(parts[0])} Bot`
+}
+
+export const fetchArticleData = async (url: string) => {
+  const res = await got('https://mercury.postlight.com/parser', {
+    query: { url: url },
+    headers: { 'x-api-key': process.env.MERCURY_API_KEY }
+  })
+  const articleData: MercuryResult = JSON.parse(res.body)
+  return articleData
 }
 
 export const COLOR = '#FEDE00'

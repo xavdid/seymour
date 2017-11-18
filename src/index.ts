@@ -1,15 +1,11 @@
 import * as Koa from 'koa'
 import * as router from 'koa-route'
 import * as bodyParser from 'koa-bodyparser'
-import * as dotenv from 'dotenv'
 import * as _ from 'lodash'
-import pickHanlder from './handlerPicker'
+import pickHanlder, { identifiersByDomain } from './handlerPicker'
 import { validateApiKey, validateInput } from './middlewares'
 
 const app = new Koa()
-if (app.env === 'development') {
-  dotenv.config()
-}
 
 app.use(bodyParser())
 
@@ -34,6 +30,12 @@ app.use(
     ctx.body = {
       routes: [
         {
+          description:
+            "mapping of domain to available identifiers. If a domain isn't listed (or you use a listed domain without an identifier), the default handler will be used",
+          route: '/identifiers',
+          method: 'GET'
+        },
+        {
           description: 'array of Slack channel objects',
           route: '/channels',
           method: 'GET'
@@ -48,21 +50,23 @@ app.use(
           description: 'send an item to a channel',
           params: {
             channel: 'slack channel id',
-            text: '[optional] message',
+            identifier:
+              '[optional] string to mark specific content in a shared domain',
             url: '[optional] url to a linked post',
-            data: {
-              NOTE: 'data object is entirely optional',
-              title: '[optional] overwite the name of the link',
-              image: '[optional] provide a header image',
-              text: '[optional] truncated content of article',
-              color: '[optional] hex string for sidebar color'
-            }
+            re_parse:
+              "[optional, bool] use an extra parser if Slack doesn't unfurl the link"
           },
           route: '/item',
           method: 'POST'
         }
       ]
     }
+  })
+)
+
+app.use(
+  router.get('/identifiers', async ctx => {
+    ctx.body = identifiersByDomain
   })
 )
 
@@ -101,15 +105,15 @@ app.use(
     validateApiKey(ctx)
     validateInput(ctx, body)
 
-    console.log(body.url, body.identifier)
+    // console.log(body.url, body.identifier)
     const handler = pickHanlder(body.url, body.identifier)
-    console.log(handler)
+    // console.log(handler)
 
     ctx.body = await handler.postToChannel(
       body.channel,
       body.url,
       slackClient,
-      body.data
+      body.re_parse || false
     )
     if (!ctx.body.ok) {
       ctx.status = 500

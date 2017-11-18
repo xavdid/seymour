@@ -2,9 +2,11 @@ import * as test from 'tape'
 
 import baseHandler from '../handlers/base'
 import xkcdHandler from '../handlers/xkcd'
-import picker, { identifiers } from '../handlerPicker'
+import picker, { identifiersByDomain } from '../handlerPicker'
 
-import { rootDomain, botNamer } from '../utils'
+import { rootDomain, botNamer, fetchArticleData } from '../utils'
+import * as dotenv from 'dotenv'
+dotenv.config()
 
 // need to test koa itself
 
@@ -23,15 +25,15 @@ test('handlers', t => {
       })
   })
 
-  test('xkcd handler', t => {
+  test('xkcd handler', async t => {
     const xkcd = new xkcdHandler()
     t.true(xkcd.botName)
-    xkcd.formatter('https://xkcd.com/1889/').then(attachmentStr => {
-      let attachments = JSON.parse(attachmentStr)
-      t.assert(attachments[0].title_link)
-      t.assert(attachments[1].fallback.includes('alt text'))
-      t.end()
-    })
+    const attachments = (await xkcd.formatter(
+      'https://xkcd.com/1889/'
+    )) as any[] // not sure why there's no interfaces here...
+    t.assert(attachments[0].title_link)
+    t.assert(attachments[1].fallback.includes('alt text'))
+    t.end()
   })
 
   test('youtube handler', t => {
@@ -53,7 +55,7 @@ test('handlers', t => {
   })
 
   test('club macstories handler', t => {
-    const url = 'https://mailchi.mp/macstories/ywfp76wxh2s'
+    const url = 'https://mailchi.mp/macstories/blahblah'
     const macstories = picker(url, 'club_macstories')
     macstories.slackOpts(url).then(([text, opts]) => {
       t.true(opts.username.includes('Club'))
@@ -64,14 +66,22 @@ test('handlers', t => {
   t.end()
 })
 
-test('utils', t => {
+test('utils', async t => {
   t.assert(
     rootDomain(
       'https://www.kickstarter.com/projects/882053899/the-name-of-the-wind-art-deck/posts/1990046'
     ) === 'kickstarter.com'
   )
 
-  t.assert(rootDomain('https://blah.thing.com/blah/id/3') === 'thing.com')
-  t.assert(identifiers.length > 1)
+  t.assert(
+    rootDomain('https://blah.sub.the.thing.com/blah/id/3') === 'thing.com'
+  )
+  t.assert(Object.keys(identifiersByDomain).length > 0)
+
+  t.true(
+    (await fetchArticleData(
+      'https://blog.codinghorror.com/the-existential-terror-of-battle-royale/'
+    )).lead_image_url
+  )
   t.end()
 })

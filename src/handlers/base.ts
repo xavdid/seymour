@@ -1,6 +1,6 @@
-import { botNamer, COLOR } from '../utils'
+import { botNamer, fetchArticleData, COLOR } from '../utils'
 
-export default class BaseHandler implements Handler {
+export default class BaseHandler {
   icon?: string
   identifier?: string
   botName?: string
@@ -12,28 +12,28 @@ export default class BaseHandler implements Handler {
   }
 
   // this gets subclassed
-  // should return json string of slack attachments
-  formatter(url: string) {
-    return Promise.resolve(new Array())
+  // should return slack attachment array
+  async formatter(url: string) {
+    return new Array()
   }
 
-  processManual(url: string, data: DataBody) {
+  // calls mercury parser
+  async reParse(url: string): Promise<SlackAttachment[]> {
+    const articleData = await fetchArticleData(url)
+    const cleanedText = articleData.excerpt.replace('&hellip;', '\u2026') // unicode ellipsis
+    // could all color here, somehow
     return [
       {
-        title: data.title,
-        text: data.text,
-        title_link: url,
-        image_url: data.image,
-        color: data.color
+        title: articleData.title,
+        title_link: articleData.url,
+        text: cleanedText,
+        image_url: articleData.lead_image_url
       }
     ]
   }
 
-  async slackOpts(url: string, manualData?: DataBody) {
-    let opts: any = {
-      unfurl_links: true,
-      unfurl_media: true
-    }
+  async slackOpts(url: string, reParse?: boolean) {
+    let opts: any = { unfurl_links: true, unfurl_media: true }
 
     if (this.icon) {
       if (this.icon[0] === ':') {
@@ -45,15 +45,16 @@ export default class BaseHandler implements Handler {
 
     opts.username = this.botName || botNamer(url)
 
+    // text might be in attachments, is nullable
     let text: string | null = url
 
-    if (manualData) {
-      opts.attachments = this.processManual(url, manualData) // process input
+    if (reParse) {
+      opts.attachments = await this.reParse(url) // process input
     } else {
       opts.attachments = await this.formatter(url) // merge overwrite objects in here somewhere
     }
 
-    if (opts.attachments.length) {
+    if (opts.attachments.length > 0) {
       text = null
     }
 
@@ -84,10 +85,10 @@ export default class BaseHandler implements Handler {
     channel: string,
     url: string,
     slackClient: any,
-    manualData?: DataBody
+    reParse: boolean
   ) {
     // do things
-    const [text, opts] = await this.slackOpts(url, manualData)
+    const [text, opts] = await this.slackOpts(url, reParse)
     try {
       const res = await slackClient.chat.postMessage(channel, text, opts)
       return { ok: true }

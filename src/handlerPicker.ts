@@ -10,7 +10,7 @@ const handlers: { [x: string]: BaseHandler[] } = {
   'boardgamegeek.com': [
     new BaseHandler('https://i.imgur.com/R3qwQEJ.png', 'BoardGameGeek Bot')
   ],
-  'codinghorror.net': [
+  'codinghorror.com': [
     new BaseHandler('https://i.imgur.com/8Dm4XWr.png', 'CodingHorror Bot')
   ],
   'escapistmagazine.com': [
@@ -55,9 +55,19 @@ const handlers: { [x: string]: BaseHandler[] } = {
   ]
 }
 
-export const identifiers = _.flatten(_.values(handlers))
-  .filter(h => h.identifier)
-  .map(h => h.identifier) as string[] // missing values are filtered
+// domains with identifiers
+export const identifiersByDomain: _.Dictionary<string[]> = _.fromPairs(
+  _.filter(
+    _.map(handlers, (domainHandlers, domain) => {
+      const identifiers = domainHandlers
+        .filter(h => h.identifier)
+        .map(h => h.identifier)
+
+      return [domain, identifiers]
+    }),
+    d => d[1].length
+  )
+)
 
 export default function(url: string, identifier?: string) {
   const domainHandlers = handlers[rootDomain(url)]
