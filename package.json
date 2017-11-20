@@ -18,12 +18,14 @@
   },
   "dependencies": {
     "@slack/client": "^3.11.0",
+    "@types/dotenv": "^4.0.1",
     "@types/got": "^7.1.5",
     "@types/koa": "^2.0.39",
     "@types/koa-bodyparser": "^3.0.23",
     "@types/koa-route": "^3.2.0",
     "@types/lodash": "^4.14.74",
     "@types/node": "^8.0.24",
+    "dotenv": "^4.0.0",
     "got": "^7.1.0",
     "koa": "^2.3.0",
     "koa-bodyparser": "^4.2.0",
@@ -33,10 +35,8 @@
     "url-parse": "github:xavdid/url-parse"
   },
   "devDependencies": {
-    "@types/dotenv": "^4.0.1",
     "@types/tape": "^4.2.30",
     "concurrently": "^3.5.0",
-    "dotenv": "^4.0.0",
     "nodemon": "^1.12.1",
     "prettier": "^1.7.4",
     "tap-spec": "^4.1.1",

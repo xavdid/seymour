@@ -2,12 +2,16 @@ import * as Koa from 'koa'
 import * as router from 'koa-route'
 import * as bodyParser from 'koa-bodyparser'
 import * as _ from 'lodash'
+import * as dotenv from 'dotenv'
 import pickHanlder, { identifiersByDomain } from './handlerPicker'
 import { validateApiKey, validateInput } from './middlewares'
 
 const app = new Koa()
 
 app.use(bodyParser())
+if (app.env === 'development') {
+  dotenv.config()
+}
 
 const WebClient = require('@slack/client').WebClient
 const slackClient = new WebClient(process.env.SLACK_API_TOKEN)

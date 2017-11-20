@@ -8,9 +8,11 @@ export default class extends BaseHandler {
 
   async formatter(url: string) {
     const comicNum = url.split('/').filter(i => i)[2] // trailing slash is ok
-    const xkcd: xkcdResponse = JSON.parse(
-      (await got.get(`https://xkcd.com/${comicNum}/info.0.json`)).body
-    )
+    const xkcd: xkcdResponse = (await got.get(
+      `https://xkcd.com/${comicNum}/info.0.json`,
+      { json: true }
+    )).body
+
     return [
       {
         title: xkcd.safe_title,

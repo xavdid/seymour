@@ -2,7 +2,9 @@ import { Context } from 'koa'
 import * as _ from 'lodash'
 
 export const validateApiKey = (ctx: Context) => {
-  if (ctx.query.api_key !== process.env.API_KEY) {
+  if (!process.env.API_KEY) {
+    ctx.throw(500, 'env variables not loaded')
+  } else if (ctx.query.api_key !== process.env.API_KEY) {
     ctx.throw(403, 'invalid or missing api key')
   }
 }

@@ -23,11 +23,14 @@ export const botNamer = (url: string) => {
 }
 
 export const fetchArticleData = async (url: string) => {
-  const res = await got('https://mercury.postlight.com/parser', {
-    query: { url: url },
-    headers: { 'x-api-key': process.env.MERCURY_API_KEY }
-  })
-  const articleData: MercuryResult = JSON.parse(res.body)
+  const articleData: MercuryResult = (await got(
+    'https://mercury.postlight.com/parser',
+    {
+      query: { url: url },
+      headers: { 'x-api-key': process.env.MERCURY_API_KEY },
+      json: true
+    }
+  )).body
   return articleData
 }
 
