@@ -10,8 +10,7 @@
     "postinstall": "tsc"
   },
   "keywords": [],
-  "author":
-    "David Brownman <beamneocube@gmail.com> (https://davidbrownman.com)",
+  "author": "David Brownman <beamneocube@gmail.com> (https://davidbrownman.com)",
   "license": "ISC",
   "engines": {
     "node": "8.9.0"
@@ -31,6 +30,7 @@
     "koa-bodyparser": "^4.2.0",
     "koa-route": "^3.2.0",
     "lodash": "^4.17.4",
+    "striptags": "^3.1.1",
     "typescript": "^2.5",
     "url-parse": "github:xavdid/url-parse"
   },

@@ -1,5 +1,6 @@
 import BaseHandler from './handlers/base'
 import xkcdHandler from './handlers/xkcd'
+import StackOverflow from './handlers/stackOverflow'
 import { rootDomain } from './utils'
 import * as _ from 'lodash'
 
@@ -44,6 +45,7 @@ const handlers: { [x: string]: BaseHandler[] } = {
     new BaseHandler('https://i.imgur.com/JBSDcz8.png'),
     new BaseHandler('https://i.imgur.com/48nSd44.png', 'CFB Bot', 'cfb')
   ],
+  'stackoverflow.com': [new StackOverflow()],
   'xkcd.com': [new xkcdHandler()],
   'youtube.com': [
     new BaseHandler('https://i.imgur.com/CnVgbNY.png'),
