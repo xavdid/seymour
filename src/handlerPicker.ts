@@ -1,13 +1,13 @@
 import BaseHandler from './handlers/base'
 import xkcdHandler from './handlers/xkcd'
 import StackOverflow from './handlers/stackOverflow'
+import AppShopper from './handlers/appShopper'
+
 import { rootDomain } from './utils'
 import * as _ from 'lodash'
 
 const handlers: { [x: string]: BaseHandler[] } = {
-  'appshopper.com': [
-    new BaseHandler('https://i.imgur.com/gJz8r3f.png', 'AppShopper Bot')
-  ],
+  'appshopper.com': [new AppShopper()],
   'boardgamegeek.com': [
     new BaseHandler('https://i.imgur.com/R3qwQEJ.png', 'BoardGameGeek Bot')
   ],

@@ -34,4 +34,4 @@ export const fetchArticleData = async (url: string) => {
   return articleData
 }
 
-export const COLOR = '#FEDE00'
+export const COLOR = '#FEDE00' // seymour yellow
