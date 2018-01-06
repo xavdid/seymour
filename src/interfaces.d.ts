@@ -15,7 +15,15 @@ interface ItemBody {
   channel: string
   url: string
   identifier?: string
-  re_parse: boolean
+  re_parse?: boolean
+  manual_data?: ManualBody
+}
+
+interface ManualBody {
+  title?: string
+  text?: string // truncated content of article
+  image?: string // header image
+  color?: string // hex string for sidebar color
 }
 
 interface SlackAttachment {

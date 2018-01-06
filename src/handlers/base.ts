@@ -32,7 +32,20 @@ export default class BaseHandler {
     ]
   }
 
-  async slackOpts(url: string, reParse?: boolean) {
+  // returns an array of slack attachments
+  async manualData(url: string, attachment: ManualBody) {
+    return [
+      {
+        title: attachment.title,
+        title_link: url,
+        text: attachment.text,
+        image_url: attachment.image,
+        color: attachment.color
+      }
+    ]
+  }
+
+  async slackOpts(url: string, reParse?: boolean, manualData?: ManualBody) {
     let opts: any = { unfurl_links: true, unfurl_media: true }
 
     if (this.icon) {
@@ -50,11 +63,13 @@ export default class BaseHandler {
 
     if (reParse) {
       opts.attachments = await this.reParse(url) // process input
+    } else if (manualData) {
+      opts.attachments = await this.manualData(url, manualData)
     } else {
       opts.attachments = await this.formatter(url) // merge overwrite objects in here somewhere
     }
 
-    if (opts.attachments.length > 0) {
+    if (opts.attachments.length) {
       text = null
     }
 
@@ -85,10 +100,11 @@ export default class BaseHandler {
     channel: string,
     url: string,
     slackClient: any,
-    reParse: boolean
+    reParse: boolean,
+    manualData?: ManualBody
   ) {
     // do things
-    const [text, opts] = await this.slackOpts(url, reParse)
+    const [text, opts] = await this.slackOpts(url, reParse, manualData)
     try {
       const res = await slackClient.chat.postMessage(channel, text, opts)
       return { ok: true }

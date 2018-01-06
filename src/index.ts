@@ -117,7 +117,8 @@ app.use(
       body.channel,
       body.url,
       slackClient,
-      body.re_parse || false
+      body.re_parse || false,
+      body.manual_data
     )
     if (!ctx.body.ok) {
       ctx.status = 500
