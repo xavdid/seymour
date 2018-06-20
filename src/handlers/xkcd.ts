@@ -6,7 +6,7 @@ export default class extends BaseHandler {
     super('https://i.imgur.com/se7HQtl.png', 'xkcd bot')
   }
 
-  async formatter(url: string) {
+  public async formatter(url: string) {
     const comicNum = url.split('/').filter(i => i)[2] // trailing slash is ok
     const xkcd: xkcdResponse = (await got.get(
       `https://xkcd.com/${comicNum}/info.0.json`,

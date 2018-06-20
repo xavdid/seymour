@@ -1,18 +1,20 @@
-import { NextFunction } from 'express'
+import { NextFunction, Response } from 'express'
 import * as _ from 'lodash'
 
-export const validateApiKey = (apiKey: string, next: NextFunction) => {
+export const validateApiKey = (
+  apiKey: string,
+  res: Response,
+  next: NextFunction
+) => {
   if (!process.env.API_KEY) {
-    const e = new Error('env variables not loaded')
-    // e.status
-    next(e)
-    // { message: })
+    next({ message: 'env variables not loaded' })
+    return false
   } else if (apiKey !== process.env.API_KEY) {
-    const e = new Error('invalid or missing api key')
-    // e.status
-    next(e)
-    // { status: 403, message:  })
+    res.status(403)
+    next({ message: 'invalid or missing api key', status: 403 })
+    return false
   }
+  return true
 }
 
 export const validateInput = (body: ItemBody, next: NextFunction) => {
@@ -24,5 +26,7 @@ export const validateInput = (body: ItemBody, next: NextFunction) => {
         body.url ? null : 'url'
       ])}`
     })
+    return false
   }
+  return true
 }

@@ -1,8 +1,4 @@
-// import * as Koa from 'koa'
-// import * as router from 'koa-route'
-// import * as bodyParser from 'koa-bodyparser'
 import * as express from 'express'
-import * as bodyParser from 'body-parser'
 
 import * as _ from 'lodash'
 import * as dotenv from 'dotenv'
@@ -65,7 +61,10 @@ app.get('/identifiers', (req, res) => {
 
 // list channels
 app.get('/channels', async (req, res, next) => {
-  validateApiKey(req.query.api_key, next)
+  // i don't love this pattern, but I need to forward the error to the error handler
+  if (!validateApiKey(req.query.api_key, next)) {
+    return
+  }
 
   const channels = (await slackClient.channels.list()).channels.filter(
     (i: any) => !i.is_archived
@@ -83,8 +82,9 @@ app.post('/read', async (req, res, next) => {
 // send item to slack
 app.post('/item', async (req, res, next) => {
   const body: ItemBody = req.body
-  validateApiKey(req.query.api_key, next)
-  validateInput(body, next)
+  if (!(validateApiKey(req.query.api_key, next) && validateInput(body, next))) {
+    return
+  }
 
   console.log('going anyway')
   // console.log(body.url, body.identifier)

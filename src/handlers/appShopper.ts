@@ -1,6 +1,4 @@
-import * as got from 'got'
 import BaseHandler from './base'
-import * as striptags from 'striptags'
 import { fetchArticleData } from '../utils'
 
 const parseAppshopperPrice = (s: string) => {
@@ -23,7 +21,7 @@ export default class extends BaseHandler {
     super('https://i.imgur.com/gJz8r3f.png', 'AppShopper Bot')
   }
 
-  async formatter(url: string) {
+  public async formatter(url: string) {
     const articleData = await fetchArticleData(url)
     const { is, was } = parseAppshopperPrice(articleData.excerpt)
     // for some reason, appshopper comes out of mercury with the app image in the url spot

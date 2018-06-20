@@ -1,9 +1,9 @@
 import { botNamer, fetchArticleData, COLOR } from '../utils'
 
 export default class BaseHandler {
-  icon?: string
-  identifier?: string
-  botName?: string
+  public icon?: string
+  public identifier?: string
+  public botName?: string
 
   constructor(icon?: string, botName?: string, identifier?: string) {
     this.icon = icon
@@ -13,12 +13,12 @@ export default class BaseHandler {
 
   // this gets subclassed
   // should return slack attachment array
-  async formatter(url: string) {
+  public async formatter(url: string) {
     return new Array()
   }
 
   // calls mercury parser
-  async reParse(url: string): Promise<SlackAttachment[]> {
+  public async reParse(url: string): Promise<SlackAttachment[]> {
     const articleData = await fetchArticleData(url)
     const cleanedText = articleData.excerpt.replace('&hellip;', '\u2026') // unicode ellipsis
     // could all color here, somehow
@@ -32,8 +32,8 @@ export default class BaseHandler {
     ]
   }
 
-  async slackOpts(url: string, reParse?: boolean) {
-    let opts: any = { unfurl_links: true, unfurl_media: true }
+  public async slackOpts(url: string, reParse?: boolean) {
+    const opts: any = { unfurl_links: true, unfurl_media: true }
 
     if (this.icon) {
       if (this.icon[0] === ':') {
@@ -81,7 +81,7 @@ export default class BaseHandler {
     return [text, opts]
   }
 
-  async postToChannel(
+  public async postToChannel(
     channel: string,
     url: string,
     slackClient: any,

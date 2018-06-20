@@ -1,6 +1,5 @@
 import * as test from 'tape'
 
-import baseHandler from '../handlers/base'
 import xkcdHandler from '../handlers/xkcd'
 import picker, { identifiersByDomain } from '../handlerPicker'
 
@@ -10,7 +9,7 @@ dotenv.config()
 
 // need to test koa itself
 
-test('handlers', t => {
+test('handlers', tester => {
   test('kickstarter handler', t => {
     const base = picker(
       'https://www.kickstarter.com/projects/882053899/the-name-of-the-wind-art-deck/posts/1990046'
@@ -63,7 +62,7 @@ test('handlers', t => {
     })
   })
 
-  t.end()
+  tester.end()
 })
 
 test('utils', async t => {

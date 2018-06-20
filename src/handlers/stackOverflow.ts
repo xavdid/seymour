@@ -7,7 +7,7 @@ export default class extends BaseHandler {
     super('https://i.imgur.com/aHypqGZ.png', 'StackOverflow Bot')
   }
 
-  async formatter(url: string) {
+  public async formatter(url: string) {
     const questionNum = url.split('/').filter(i => i)[3] // trailing slash is ok
     const response: StackExchangeResponse = (await got.get(
       `https://api.stackexchange.com/2.2/questions/${questionNum}`,
