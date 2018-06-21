@@ -1,5 +1,5 @@
 {
-  "name": "seymour",
+  "name": "@seymour/server",
   "version": "1.0.0",
   "description": "",
   "main": "lib/index.js",
@@ -14,9 +14,10 @@
   "author": "David Brownman <beamneocube@gmail.com> (https://davidbrownman.com)",
   "license": "ISC",
   "engines": {
-    "node": "8.9.0"
+    "node": ">=8.9.0"
   },
   "dependencies": {
+    "@seymour/handlers": "file:../seymour-handlers",
     "@slack/client": "^3.11.0",
     "@types/dotenv": "^4.0.1",
     "@types/got": "^7.1.5",

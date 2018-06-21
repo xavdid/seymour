@@ -1,16 +1,11 @@
 import { NextFunction, Response } from 'express'
 import * as _ from 'lodash'
 
-export const validateApiKey = (
-  apiKey: string,
-  res: Response,
-  next: NextFunction
-) => {
+export const validateApiKey = (apiKey: string, next: NextFunction) => {
   if (!process.env.API_KEY) {
     next({ message: 'env variables not loaded' })
     return false
   } else if (apiKey !== process.env.API_KEY) {
-    res.status(403)
     next({ message: 'invalid or missing api key', status: 403 })
     return false
   }

@@ -2,7 +2,7 @@ import * as express from 'express'
 
 import * as _ from 'lodash'
 import * as dotenv from 'dotenv'
-import pickHanlder, { identifiersByDomain } from './handlerPicker'
+import { identifiersByDomain, pickHandler } from '@seymour/handlers'
 import { validateApiKey, validateInput } from './middlewares'
 
 const app = express()
@@ -88,7 +88,7 @@ app.post('/item', async (req, res, next) => {
 
   console.log('going anyway')
   // console.log(body.url, body.identifier)
-  const handler = pickHanlder(body.url, body.identifier)
+  const handler = pickHandler(body.url, body.identifier)
   // console.log(handler)
 
   const response = await handler.postToChannel(
