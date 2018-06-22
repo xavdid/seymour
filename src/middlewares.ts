@@ -1,4 +1,4 @@
-import { NextFunction, Response } from 'express'
+import { NextFunction } from 'express'
 import * as _ from 'lodash'
 
 export const validateApiKey = (apiKey: string, next: NextFunction) => {
