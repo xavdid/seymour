@@ -1,15 +1,18 @@
-import { Express, json, urlencoded, ErrorRequestHandler } from 'express'
-
 import { parse as qsParse } from 'querystring'
 import { parse as urlParse } from 'url'
 
 import * as _ from 'lodash'
 import * as dotenv from 'dotenv'
 import { identifiersByDomain, pickHandler } from '@seymour/handlers'
-import { validateApiKey, validateInput } from './middlewares'
+import { validApiKey, validBody } from './middlewares'
 
 import { IncomingMessage, ServerResponse } from 'http'
 import * as getRawBody from 'raw-body'
+
+// I think slack has types by now
+if (process.env.NODE_ENV !== 'production') {
+  dotenv.config()
+}
 
 const WebClient = require('@slack/client').WebClient
 const slackClient = new WebClient(process.env.SLACK_API_TOKEN)
@@ -22,12 +25,6 @@ const respond = (response: ServerResponse, o: object, statusCode = 200) => {
   response.end(JSON.stringify(o))
 }
 
-type replyFunc = (o: object, statusCode?: number) => void
-interface Route {
-  handler: (reply: replyFunc) => void
-  protected?: boolean
-  description: string
-}
 // const METHODS = 'GET'|| 'POST' || 'PUT' || 'DELETE'
 
 const routes: { [method: string]: { [path: string]: Route } } = {
@@ -86,6 +83,7 @@ const routes: { [method: string]: { [path: string]: Route } } = {
         )
         reply(channels.map((channel: any) => _.pick(channel, ['id', 'name'])))
       },
+      requiredProps: ['url', 'channel'],
       description: 'array of Slack channel objects'
     }
   },
@@ -96,8 +94,18 @@ const routes: { [method: string]: { [path: string]: Route } } = {
     },
     '/item': {
       protected: true,
-      handler: reply => {
-        throw new Error('implement!')
+      handler: async (reply, body) => {
+        const itemBody = body as ItemBody
+        const handler = pickHandler(itemBody.url, itemBody.identifier)
+        // console.log(handler)
+
+        const response = await handler.postToChannel(
+          itemBody.channel,
+          itemBody.url,
+          slackClient,
+          itemBody.re_parse || false
+        )
+        reply(response, response.ok ? undefined : 500)
       },
       description: 'send an item to a channel'
     }
@@ -113,92 +121,36 @@ export const serve = async (
   try {
     // parse the url out
     const urlObj = urlParse(request.url!)
-    if (request.method === 'GET') {
-      const query = qsParse(urlObj.query!)
-      reply({ ok: true, query })
-    } else if (request.method === 'POST') {
-      const body = JSON.parse(await getRawBody(request, { encoding: true }))
-      reply(body)
+    const path = urlObj.pathname!
+    const apiKey = qsParse(urlObj.query!).api_key as string
+
+    if (path === '/') {
+      // introspection function
+      return
+    }
+
+    let body
+    if (request.method === 'POST') {
+      body = JSON.parse(await getRawBody(request, { encoding: true }))
+    }
+
+    const route: Route | undefined = _.get(routes, [request.method!, path])
+    if (route) {
+      if (route.protected && !validApiKey(apiKey, reply)) {
+        return
+      }
+
+      if (route.requiredProps && !validBody(body, route.requiredProps, reply)) {
+        return
+      }
+      // might not even need the await? it'll just happen eventually
+      await route.handler(reply, body)
     } else {
-      reply({ ok: false }, 405)
+      reply({ ok: false }, 404)
     }
   } catch (e) {
+    // this is for accidential things, not error handling
     response.statusCode = 500
     response.end({ message: e.message })
   }
-}
-
-export const bootstrap = (app: Express) => {
-  app.use(json())
-  app.use(urlencoded({ extended: false }))
-
-  if (app.get('env') === 'development') {
-    dotenv.config()
-  }
-
-  // give json instructions
-  app.get('/', async (req, res) => {
-    res.json()
-  })
-
-  app.get('/identifiers', (req, res) => {
-    res.json(identifiersByDomain)
-  })
-
-  // list channels
-  app.get('/channels', async (req, res, next) => {
-    // i don't love this pattern, but I need to forward the error to the error handler
-    if (!validateApiKey(req.query.api_key, next)) {
-      return
-    }
-
-    const channels = (await slackClient.channels.list()).channels.filter(
-      (i: any) => !i.is_archived
-    )
-    res.json(channels.map((channel: any) => _.pick(channel, ['id', 'name'])))
-  })
-
-  // mark item as read
-  app.post('/read', async (req, res, next) => {
-    res.status(200).json({
-      text: '_marked as read_'
-    })
-  })
-
-  // send item to slack
-  app.post('/item', async (req, res, next) => {
-    const body: ItemBody = req.body
-    if (
-      !(validateApiKey(req.query.api_key, next) && validateInput(body, next))
-    ) {
-      return
-    }
-
-    console.log('going anyway')
-    // console.log(body.url, body.identifier)
-    const handler = pickHandler(body.url, body.identifier)
-    // console.log(handler)
-
-    const response = await handler.postToChannel(
-      body.channel,
-      body.url,
-      slackClient,
-      body.re_parse || false
-    )
-    if (!response.ok) {
-      res.status(500)
-    }
-    res.json(response)
-  })
-
-  // error handler
-  const errHandler: ErrorRequestHandler = (err, req, res, next) => {
-    res.status(err.status || 500).send({ message: err.message })
-  }
-  app.use(errHandler)
-
-  // const listener = app.listen(process.env.PORT || 1234, () => {
-  //   console.log(`app is listening on http://localhost:${listener.address().port}`)
-  // })
-  return app
 }

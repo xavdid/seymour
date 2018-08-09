@@ -1,26 +1,24 @@
-import { NextFunction } from 'express'
 import * as _ from 'lodash'
 
-export const validateApiKey = (apiKey: string, next: NextFunction) => {
+export const validApiKey = (apiKey: string, reply: replyFunc) => {
   if (!process.env.API_KEY) {
-    next({ message: 'env variables not loaded' })
+    reply({ message: 'env variables not loaded' }, 500)
     return false
   } else if (apiKey !== process.env.API_KEY) {
-    next({ message: 'invalid or missing api key', status: 403 })
+    reply({ message: 'invalid or missing api key' }, 403)
     return false
   }
   return true
 }
 
-export const validateInput = (body: ItemBody, next: NextFunction) => {
-  if (!(body.channel && body.url)) {
-    next({
-      status: 400,
-      message: `missing params: ${_.filter([
-        body.channel ? null : 'channel',
-        body.url ? null : 'url'
-      ])}`
-    })
+export const validBody = (
+  body: ItemBody,
+  requiredProps: string[],
+  reply: replyFunc
+) => {
+  const missingProps = _.difference(Object.keys(body), requiredProps)
+  if (missingProps.length) {
+    reply({ message: `missing body properties: ${missingProps}` }, 400)
     return false
   }
   return true
