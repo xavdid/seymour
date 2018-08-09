@@ -5,7 +5,26 @@ import * as dotenv from 'dotenv'
 import { identifiersByDomain, pickHandler } from '@seymour/handlers'
 import { validateApiKey, validateInput } from './middlewares'
 
-// const app = express()
+import { IncomingMessage, ServerResponse } from 'http'
+import * as getRawBody from 'raw-body'
+
+export const reply = async (
+  request: IncomingMessage,
+  response: ServerResponse
+) => {
+  // parse the url out
+  if (request.method === 'GET') {
+    response.end(JSON.stringify({ ok: true, query: qs.parse(request.url) }))
+    return
+  } else if (request.method === 'POST') {
+    const body = await getRawBody(request, { encoding: true })
+    response.end(body)
+    console.log('after')
+  } else {
+    response.statusCode = 405
+    response.end(JSON.stringify({ ok: false, status: 405 }))
+  }
+}
 
 export const bootstrap = (app: Express) => {
   app.use(json())
