@@ -27,7 +27,7 @@ const respond = (response: ServerResponse, o: object, statusCode = 200) => {
 
 // const METHODS = 'GET'|| 'POST' || 'PUT' || 'DELETE'
 
-const routes: { [method: string]: { [path: string]: Route } } = {
+const routesz: { [method: string]: { [path: string]: Route } } = {
   GET: {
     '/': {
       description: 'This route, an explanation of everything',
@@ -56,14 +56,7 @@ const routes: { [method: string]: { [path: string]: Route } } = {
             },
             {
               description: 'send an item to a channel',
-              params: {
-                channel: 'slack channel id',
-                identifier:
-                  '[optional] string to mark specific content in a shared domain',
-                url: '[optional] url to a linked post',
-                re_parse:
-                  "[optional, bool] use an extra parser if Slack doesn't unfurl the link"
-              },
+
               route: '/item',
               method: 'POST'
             }
@@ -83,7 +76,6 @@ const routes: { [method: string]: { [path: string]: Route } } = {
         )
         reply(channels.map((channel: any) => _.pick(channel, ['id', 'name'])))
       },
-      requiredProps: ['url', 'channel'],
       description: 'array of Slack channel objects'
     }
   },
@@ -97,7 +89,6 @@ const routes: { [method: string]: { [path: string]: Route } } = {
       handler: async (reply, body) => {
         const itemBody = body as ItemBody
         const handler = pickHandler(itemBody.url, itemBody.identifier)
-        // console.log(handler)
 
         const response = await handler.postToChannel(
           itemBody.channel,
@@ -107,7 +98,14 @@ const routes: { [method: string]: { [path: string]: Route } } = {
         )
         reply(response, response.ok ? undefined : 500)
       },
-      description: 'send an item to a channel'
+      description: 'send an item to a channel',
+      requiredProperties: ['url', 'channel'],
+      properties: {
+        channel: 'slack channel id',
+        url: 'url to a linked post',
+        identifier: 'string to mark specific content in a shared domain',
+        re_parse: "use an extra parser if Slack doesn't unfurl the link"
+      }
     }
   }
 }
@@ -126,21 +124,42 @@ export const serve = async (
 
     if (path === '/') {
       // introspection function
+      const routes: any[] = []
+
+      for (const method in routesz) {
+        for (const ppath in routesz[method]) {
+          const routee = routesz[method][ppath]
+          routes.push({
+            method,
+            path: ppath,
+            ..._.pickBy(routee, k => k !== 'handler')
+          })
+        }
+      }
+
+      reply({ routes })
       return
     }
 
     let body
     if (request.method === 'POST') {
-      body = JSON.parse(await getRawBody(request, { encoding: true }))
+      try {
+        body = JSON.parse(await getRawBody(request, { encoding: true }))
+      } catch {
+        body = {}
+      }
     }
 
-    const route: Route | undefined = _.get(routes, [request.method!, path])
+    const route: Route | undefined = _.get(routesz, [request.method!, path])
     if (route) {
       if (route.protected && !validApiKey(apiKey, reply)) {
         return
       }
 
-      if (route.requiredProps && !validBody(body, route.requiredProps, reply)) {
+      if (
+        route.requiredProperties &&
+        !validBody(body, route.requiredProperties, reply)
+      ) {
         return
       }
       // might not even need the await? it'll just happen eventually
@@ -150,7 +169,6 @@ export const serve = async (
     }
   } catch (e) {
     // this is for accidential things, not error handling
-    response.statusCode = 500
-    response.end({ message: e.message })
+    reply({ message: e.message, trace: e.stack.split('\n') }, 500)
   }
 }

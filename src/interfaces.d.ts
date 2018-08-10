@@ -11,5 +11,6 @@ interface Route {
   handler: (reply: replyFunc, body?: object) => void
   protected?: boolean
   description: string
-  requiredProps?: string[]
+  requiredProperties?: string[]
+  properties?: object
 }
