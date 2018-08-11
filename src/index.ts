@@ -10,7 +10,7 @@ import { Route, replyFunc } from './interfaces'
 
 import { routes } from './routes'
 
-export const serve = async (
+export const listener = async (
   request: IncomingMessage,
   response: ServerResponse
 ) => {

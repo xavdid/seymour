@@ -1,25 +1,26 @@
 import * as dotenv from 'dotenv'
 dotenv.config()
 
-import { createServer } from 'http'
-import * as got from 'got'
+jest.setTimeout(500)
 
-import { serve } from '../src'
+import * as got from 'got'
+import { start, stop, isRunning } from '../src/server'
 
 const hostname = '127.0.0.1'
 const port = 3000
 const baseUrl = `http://${hostname}:${port}`
 
-const server = createServer(serve)
-
 const testChannel = 'C6RBZ562Z'
 
 describe('server', () => {
   beforeAll(async () => {
-    server.listen(port, hostname, () => {
-      console.log(`Server running at ${baseUrl}`)
-      return Promise.resolve()
-    })
+    try {
+      await start()
+    } catch (e) {
+      if (e.code !== 'EADDRINUSE') {
+        throw e
+      }
+    }
   })
 
   test('should load routes', async () => {
@@ -95,5 +96,5 @@ describe('server', () => {
     })
   })
 
-  afterAll(() => server.close())
+  afterAll(() => stop())
 })
