@@ -4,11 +4,11 @@ import { identifiersByDomain, pickHandler } from '@seymour/handlers/lib'
 
 import { Route, ItemBody } from './interfaces'
 
-// I think slack has types by now
 if (process.env.NODE_ENV !== 'production') {
   dotenv.config()
 }
 
+// I think slack has types by now
 const WebClient = require('@slack/client').WebClient
 const slackClient = new WebClient(process.env.SLACK_API_TOKEN)
 
