@@ -32,5 +32,6 @@ export const respond = (
   statusCode = 200
 ) => {
   response.statusCode = statusCode
+  response.setHeader('Content-Type', 'application/json')
   response.end(JSON.stringify(o))
 }

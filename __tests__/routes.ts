@@ -1,10 +1,10 @@
 import * as dotenv from 'dotenv'
 dotenv.config()
 
-jest.setTimeout(500)
+// jest.setTimeout(500)
 
 import * as got from 'got'
-import { start, stop, isRunning } from '../src/server'
+import { start, stop } from '../src/server'
 
 const hostname = '127.0.0.1'
 const port = 3000

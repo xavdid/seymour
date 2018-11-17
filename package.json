@@ -17,7 +17,8 @@
   "files": [
     "lib/index.js",
     "lib/routes.js",
-    "lib/utils.js"
+    "lib/utils.js",
+    "lib/server.js"
   ],
   "dependencies": {
     "@seymour/handlers": "0.0.1",
