@@ -5,6 +5,7 @@
   "main": "lib/index.js",
   "scripts": {
     "build": "tsc",
+    "heroku-postbuild": "yarn build",
     "deploy": "npx np",
     "dev": "concurrently \"tsc -w\" \"nodemon -w lib -d 1 lib/server.js\"",
     "start": "node lib/server.js",
