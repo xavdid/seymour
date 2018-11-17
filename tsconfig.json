@@ -5,8 +5,7 @@
     "outDir": "./lib",
     "rootDir": "./src",
     "strict": true,
-    "noImplicitReturns": true,
-    "sourceMap": true
+    "noImplicitReturns": true
   },
   "exclude": ["__tests__"]
 }
