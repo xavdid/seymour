@@ -1,12 +1,7 @@
 import { pick, pickBy } from 'lodash'
-import * as dotenv from 'dotenv'
 import { identifiersByDomain, pickHandler } from '@seymour/handlers/lib'
 
 import { Route, ItemBody } from './interfaces'
-
-if (process.env.NODE_ENV !== 'production') {
-  dotenv.config()
-}
 
 // I think slack has types by now
 const WebClient = require('@slack/client').WebClient

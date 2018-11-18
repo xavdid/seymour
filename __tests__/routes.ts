@@ -1,23 +1,19 @@
-import * as dotenv from 'dotenv'
-dotenv.config()
-
-// jest.setTimeout(500)
-
 import * as got from 'got'
 import { start, stop } from '../src/server'
-
-const hostname = '127.0.0.1'
-const port = 3000
-const baseUrl = `http://${hostname}:${port}`
 
 const testChannel = 'C6RBZ562Z'
 
 describe('server', () => {
+  let started = true
+  let baseUrl
   beforeAll(async () => {
     try {
-      await start()
+      const addr = await start()
+      baseUrl = `http://localhost:${addr.port}`
     } catch (e) {
       if (e.code !== 'EADDRINUSE') {
+        // the dev server is running already
+        started = false
         throw e
       }
     }
@@ -96,5 +92,6 @@ describe('server', () => {
     })
   })
 
-  afterAll(() => stop())
+  // only stop if we started it
+  afterAll(() => started && stop())
 })

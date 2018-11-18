@@ -32,7 +32,7 @@ export const listener = async (
 
     const route: Route | undefined = get(routes, [request.method!, path])
     if (!route) {
-      reply({ ok: false }, 404)
+      reply({ ok: false, message: 'not found (or wrong method)' }, 404)
       return
     }
 

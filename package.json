@@ -7,7 +7,6 @@
     "build": "tsc",
     "heroku-postbuild": "yarn build",
     "deploy": "npx np",
-    "dev": "concurrently \"tsc -w\" \"nodemon -w lib -d 1 lib/server.js\"",
     "start": "node lib/server.js",
     "test": "jest",
     "posttest": " tslint -p ."
@@ -16,10 +15,7 @@
   "author": "David Brownman <beamneocube@gmail.com> (https://davidbrownman.com)",
   "license": "ISC",
   "files": [
-    "lib/index.js",
-    "lib/routes.js",
-    "lib/utils.js",
-    "lib/server.js"
+    "./lib"
   ],
   "dependencies": {
     "@seymour/handlers": "0.0.1",
@@ -61,5 +57,10 @@
       "json",
       "node"
     ]
+  },
+  "nodemonConfig": {
+    "watch": ["lib"],
+    "delay": 2,
+    "exec": "node -r dotenv/config lib/server.js"
   }
 }

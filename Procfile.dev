@@ -1,0 +1,6 @@
+# each line adds 100 to the port
+
+# runs the server, server first to get the port I want
+web: npx nodemon
+
+ts: npx tsc -w
