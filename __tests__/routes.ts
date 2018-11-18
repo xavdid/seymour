@@ -1,3 +1,6 @@
+import { load } from 'dotenv'
+load()
+
 import * as got from 'got'
 import { start, stop } from '../src/server'
 

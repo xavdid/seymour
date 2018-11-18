@@ -45,6 +45,7 @@
     "singleQuote": true
   },
   "jest": {
+    "verbose": true,
     "transform": {
       "^.+\\.tsx?$": "ts-jest"
     },
