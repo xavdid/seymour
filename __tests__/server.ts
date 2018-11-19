@@ -7,19 +7,10 @@ import { start, stop } from '../src/server'
 const testChannel = 'C6RBZ562Z'
 
 describe('server', () => {
-  let started = true
-  let baseUrl
+  let baseUrl: string
   beforeAll(async () => {
-    try {
-      const addr = await start()
-      baseUrl = `http://localhost:${addr.port}`
-    } catch (e) {
-      if (e.code !== 'EADDRINUSE') {
-        // the dev server is running already
-        started = false
-        throw e
-      }
-    }
+    const addr = await start()
+    baseUrl = `http://localhost:${addr.port}`
   })
 
   test('should load routes', async () => {
@@ -72,8 +63,11 @@ describe('server', () => {
         body: {
           url: 'https://xkcd.com/2030/',
           channel: testChannel
-        }
+        },
+        throwHttpErrors: false
       })).body
+
+      console.log(response)
 
       expect(response).toEqual({ ok: true })
     })
@@ -95,6 +89,5 @@ describe('server', () => {
     })
   })
 
-  // only stop if we started it
-  afterAll(() => started && stop())
+  afterAll(() => stop())
 })

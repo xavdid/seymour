@@ -1,10 +1,9 @@
 import { pick, pickBy } from 'lodash'
-import { identifiersByDomain, pickHandler } from '@seymour/handlers/lib'
+import { identifiersByDomain, pickHandler } from './handlerUtils'
+import { WebClient } from '@slack/client'
 
-import { Route, ItemBody } from './interfaces'
+import { Route, ItemBody, SlackChannelResult } from './interfaces'
 
-// I think slack has types by now
-const WebClient = require('@slack/client').WebClient
 const slackClient = new WebClient(process.env.SLACK_API_TOKEN)
 
 const rootDescription = 'This route! Documentation for all the others'
@@ -19,10 +18,13 @@ const routes: { [method: string]: { [path: string]: Route } } = {
     '/channels': {
       protected: true,
       handler: async reply => {
-        const channels = (await slackClient.channels.list()).channels.filter(
-          (i: any) => !i.is_archived
+        const channelResponse = (await slackClient.conversations.list({
+          exclude_archived: true,
+          types: 'public_channel'
+        })) as SlackChannelResult
+        reply(
+          channelResponse.channels.map(channel => pick(channel, ['id', 'name']))
         )
-        reply(channels.map((channel: any) => pick(channel, ['id', 'name'])))
       },
       description: 'array of Slack channel objects'
     }
@@ -50,7 +52,7 @@ const routes: { [method: string]: { [path: string]: Route } } = {
       requiredProperties: ['url', 'channel'],
       properties: {
         channel: '[string] slack channel id',
-        url: '[string] url to post into slack',
+        url: '[string] url to post into Slack',
         identifier:
           '[string] denote that a link belongs to a specific subgroup in a shared domain',
         re_parse:

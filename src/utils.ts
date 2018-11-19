@@ -1,6 +1,12 @@
-import { difference } from 'lodash'
+import { difference, capitalize } from 'lodash'
 import { ItemBody, replyFunc } from './interfaces'
 import { ServerResponse } from 'http'
+import * as parser from 'url-parse'
+
+import * as got from 'got'
+import { MercuryResult } from './interfaces'
+
+export const COLOR = '#FEDE00' // seymour yellow
 
 export const validApiKey = (apiKey: string, reply: replyFunc) => {
   if (!process.env.API_KEY) {
@@ -34,4 +40,32 @@ export const respond = (
   response.statusCode = statusCode
   response.setHeader('Content-Type', 'application/json')
   response.end(JSON.stringify(o))
+}
+
+export const rootDomain = (url: string) => {
+  const parts = parser(url).host.split('.')
+  while (parts.length > 2) {
+    parts.shift()
+  }
+
+  return parts.join('.')
+}
+
+export const botNamer = (url: string) => {
+  const domain = rootDomain(url)
+  const parts = domain.split('.')
+  // probably just 2 parts
+  return `${capitalize(parts[0])} Bot`
+}
+
+export const fetchArticleData = async (url: string) => {
+  const articleData: MercuryResult = (await got(
+    'https://mercury.postlight.com/parser',
+    {
+      query: { url },
+      headers: { 'x-api-key': process.env.MERCURY_API_KEY },
+      json: true
+    }
+  )).body
+  return articleData
 }
