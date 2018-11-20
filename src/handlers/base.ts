@@ -1,28 +1,26 @@
 import { botNamer, fetchArticleData, COLOR } from '../utils'
-import { SlackAttachment } from '../interfaces'
+import { WebClient, ChatPostMessageArguments } from '@slack/client'
+import { MessageAttachment } from '@slack/client'
 
 export default class BaseHandler {
-  public icon?: string
-  public identifier?: string
-  public botName?: string
-
-  constructor(icon?: string, botName?: string, identifier?: string) {
-    this.icon = icon
-    this.botName = botName
-    this.identifier = identifier
-  }
+  // can this be made into an options object and still take advantage of the shorthand?
+  constructor(
+    public icon?: string,
+    public botName?: string,
+    public identifier?: string
+  ) {}
 
   // this gets subclassed
   // should return slack attachment array
-  public async formatter(url: string) {
+  public async formatter(url: string): Promise<MessageAttachment[]> {
     return new Array()
   }
 
-  // calls mercury parser
-  public async reParse(url: string): Promise<SlackAttachment[]> {
+  // calls mercury parser if a site doesn't have good metadata
+  public async reParse(url: string): Promise<MessageAttachment[]> {
     const articleData = await fetchArticleData(url)
     const cleanedText = articleData.excerpt.replace('&hellip;', '\u2026') // unicode ellipsis
-    // could all color here, somehow
+
     return [
       {
         title: articleData.title,
@@ -33,11 +31,12 @@ export default class BaseHandler {
     ]
   }
 
-  public async slackOpts(
-    url: string,
-    reParse?: boolean
-  ): Promise<[string | null, { [x: string]: any }]> {
-    const opts: any = { unfurl_links: true, unfurl_media: true }
+  public async slackOpts(url: string, reParse?: boolean) {
+    const opts: { text: string } & Partial<ChatPostMessageArguments> = {
+      unfurl_links: true,
+      unfurl_media: true,
+      text: url
+    }
 
     if (this.icon) {
       if (this.icon[0] === ':') {
@@ -45,12 +44,12 @@ export default class BaseHandler {
       } else {
         opts.icon_url = this.icon
       }
+    } else {
+      // that api that gives the site logos for free (clearbit?)
+      // opts.icon_url = ''
     }
 
     opts.username = this.botName || botNamer(url)
-
-    // text might be in attachments, is nullable
-    let text: string | null = url
 
     if (reParse) {
       opts.attachments = await this.reParse(url) // process input
@@ -58,43 +57,42 @@ export default class BaseHandler {
       opts.attachments = await this.formatter(url) // merge overwrite objects in here somewhere
     }
 
-    if (opts.attachments.length > 0) {
-      text = null
+    if (opts.attachments.length) {
+      opts.text = ''
     }
 
-    // add button, stringify
-    opts.attachments = JSON.stringify(
-      opts.attachments.concat([
-        {
-          fallback: 'never seen',
-          callback_id: 'comic_1234_xyz', // this doesn't matter?
-          color: COLOR,
-          attachment_type: 'default',
-          actions: [
-            {
-              name: 'read',
-              text: 'Mark as Read',
-              type: 'button',
-              value: 'read2'
-            }
-          ]
-        }
-      ])
-    )
+    // add button
+    opts.attachments = opts.attachments.concat([
+      {
+        // fallback: 'never seen',
+        // callback_id: 'comic_1234_xyz', // this doesn't matter?
+        color: COLOR,
+        // attachment_type: 'default',
+        actions: [
+          {
+            // name: 'read',
+            text: 'Mark as Read',
+            type: 'button'
+            // value: 'read2'
+          }
+        ]
+      }
+    ])
 
-    return [text, opts]
+    return opts
   }
 
   public async postToChannel(
     channel: string,
     url: string,
-    slackClient: any,
+    slackClient: WebClient,
     reParse: boolean
   ) {
     // do things
-    const [text, opts] = await this.slackOpts(url, reParse)
+    const opts = await this.slackOpts(url, reParse)
     try {
-      const res = await slackClient.chat.postMessage(channel, text, opts)
+      const res = await slackClient.chat.postMessage({ channel, ...opts })
+      console.log(res)
       return { ok: true }
     } catch (e) {
       console.log(e)

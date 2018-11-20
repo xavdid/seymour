@@ -6,10 +6,12 @@
   "scripts": {
     "build": "tsc",
     "heroku-postbuild": "yarn build",
-    "deploy": "npx np",
     "start": "node lib/server.js",
     "test": "jest",
-    "posttest": " tslint -p ."
+    "lint": "tslint -p .",
+    "posttest": "yarn lint",
+    "fresh": "yarn clean && yarn lint && yarn build",
+    "clean": "rm -rf lib"
   },
   "keywords": [],
   "author": "David Brownman <beamneocube@gmail.com> (https://davidbrownman.com)",

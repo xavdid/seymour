@@ -4,7 +4,7 @@ import { ServerResponse } from 'http'
 import * as parser from 'url-parse'
 
 import * as got from 'got'
-import { MercuryResult } from './interfaces'
+import { MercuryResponse } from './interfaces'
 
 export const COLOR = '#FEDE00' // seymour yellow
 
@@ -59,7 +59,7 @@ export const botNamer = (url: string) => {
 }
 
 export const fetchArticleData = async (url: string) => {
-  const articleData: MercuryResult = (await got(
+  const articleData: MercuryResponse = (await got(
     'https://mercury.postlight.com/parser',
     {
       query: { url },

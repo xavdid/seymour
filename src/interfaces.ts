@@ -47,12 +47,12 @@ export interface SlackChannel {
   num_members: number
 }
 
-export interface SlackChannelResult extends WebAPICallResult {
+export interface SlackChannelResponse extends WebAPICallResult {
   channels: SlackChannel[]
 }
 
 // https://mercury.postlight.com/web-parser/
-export interface MercuryResult {
+export interface MercuryResponse {
   title: string
   author?: string
   content: string // html string
@@ -69,16 +69,6 @@ export interface ItemBody {
   url: string
   identifier?: string
   re_parse: boolean
-}
-
-export interface SlackAttachment {
-  title?: string
-  text?: string
-  title_link?: string
-  fallback?: string
-  image_url?: string
-  color?: string
-  footer?: string
 }
 
 // specific responses

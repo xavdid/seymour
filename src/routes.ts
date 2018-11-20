@@ -1,8 +1,8 @@
 import { pick, pickBy } from 'lodash'
-import { identifiersByDomain, pickHandler } from './handlerUtils'
+import { identifiersByDomain, pickHandler } from './handlers'
 import { WebClient } from '@slack/client'
 
-import { Route, ItemBody, SlackChannelResult } from './interfaces'
+import { Route, ItemBody, SlackChannelResponse } from './interfaces'
 
 const slackClient = new WebClient(process.env.SLACK_API_TOKEN)
 
@@ -21,7 +21,7 @@ const routes: { [method: string]: { [path: string]: Route } } = {
         const channelResponse = (await slackClient.conversations.list({
           exclude_archived: true,
           types: 'public_channel'
-        })) as SlackChannelResult
+        })) as SlackChannelResponse
         reply(
           channelResponse.channels.map(channel => pick(channel, ['id', 'name']))
         )

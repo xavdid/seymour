@@ -63,11 +63,8 @@ describe('server', () => {
         body: {
           url: 'https://xkcd.com/2030/',
           channel: testChannel
-        },
-        throwHttpErrors: false
+        }
       })).body
-
-      console.log(response)
 
       expect(response).toEqual({ ok: true })
     })
