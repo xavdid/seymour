@@ -35,14 +35,19 @@ const handlers: { [domain: string]: { [identifier: string]: BaseHandler } } = {
       'https://i.imgur.com/1MKAeXw.png'
     )
   },
-  'macstories.net': { _default: new BaseHandler(undefined, 'MacStories Bot') },
+  'macstories.net': {
+    _default: new BaseHandler(
+      'https://i.imgur.com/0NqKUfZ.png',
+      'MacStories Bot'
+    )
+  },
   'mailchi.mp': {
     club_macstories: new BaseHandler(
       'https://i.imgur.com/v8SJ8jz.png',
       'Club Macstories Bot'
     )
   },
-  'pbs.org': { vicky_writing: new BaseHandler(undefined, 'Vicky Bot') },
+  'pbs.org': { vicky_writing: new BaseHandler(undefined, 'VickyWriting Bot') },
   'reddit.com': {
     _default: new BaseHandler('https://i.imgur.com/JBSDcz8.png'),
     cfb: new BaseHandler('https://i.imgur.com/48nSd44.png', 'CFB Bot')

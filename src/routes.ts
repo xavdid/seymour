@@ -6,8 +6,6 @@ import { Route, ItemBody, SlackChannelResponse } from './interfaces'
 
 const slackClient = new WebClient(process.env.SLACK_API_TOKEN)
 
-const rootDescription = 'This route! Documentation for all the others'
-
 const routes: { [method: string]: { [path: string]: Route } } = {
   GET: {
     '/identifiers': {
@@ -40,13 +38,14 @@ const routes: { [method: string]: { [path: string]: Route } } = {
         const itemBody = body as ItemBody
         const handler = pickHandler(itemBody.url, itemBody.identifier)
 
-        const response = await handler.postToChannel(
-          itemBody.channel,
-          itemBody.url,
-          slackClient,
-          itemBody.re_parse || false
+        reply(
+          await handler.postToChannel(
+            itemBody.channel,
+            itemBody.url,
+            slackClient,
+            itemBody.re_parse || false
+          )
         )
-        reply(response, response.ok ? undefined : 500)
       },
       description: 'send an item to a channel',
       requiredProperties: ['url', 'channel'],
@@ -63,21 +62,15 @@ const routes: { [method: string]: { [path: string]: Route } } = {
 }
 
 const introspectRoutes = () => {
-  const res: any[] = [
-    {
-      method: 'GET',
-      path: '/',
-      description: rootDescription
-    }
-  ]
+  const res: any[] = []
 
   for (const method in routes) {
-    for (const ppath in routes[method]) {
-      const routee = routes[method][ppath]
+    for (const path in routes[method]) {
+      const route = routes[method][path]
       res.push({
         method,
-        path: ppath,
-        ...pickBy(routee, k => k !== 'handler')
+        path,
+        ...pickBy(route, k => k !== 'handler')
       })
     }
   }
@@ -89,7 +82,7 @@ const routeDescriptions = introspectRoutes()
 // so that this actually runs
 routes.GET['/'] = {
   handler: reply => reply({ routes: routeDescriptions }),
-  description: rootDescription
+  description: 'This route! Documentation for all the others'
 }
 
 export { routes }

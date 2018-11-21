@@ -3,6 +3,7 @@ load()
 
 import * as got from 'got'
 import { start, stop } from '../src/server'
+import { SlackMessage, ItemBody } from '../src/interfaces'
 
 const testChannel = 'C6RBZ562Z'
 
@@ -55,7 +56,92 @@ describe('server', () => {
   })
 
   describe('items', () => {
-    test('should post items', async () => {
+    test('should post items with a generic handler', async () => {
+      const response = (await got(`${baseUrl}/item`, {
+        query: { api_key: process.env.API_KEY },
+        method: 'POST',
+        json: true,
+        body: {
+          url: 'https://en.wikipedia.org/wiki/December_6',
+          channel: testChannel
+        } as ItemBody
+      })).body as SlackMessage
+
+      // most links have the preview and the the button
+      expect(response.attachments.length).toEqual(1)
+      expect(response.username.includes('Wiki')).toBeTruthy()
+    })
+
+    test('should post items with a handler', async () => {
+      const response = (await got(`${baseUrl}/item`, {
+        query: { api_key: process.env.API_KEY },
+        method: 'POST',
+        json: true,
+        body: {
+          url:
+            'https://www.macstories.net/news/google-integrates-assistant-app-with-siri-shortcuts-on-ios/',
+          channel: testChannel
+        } as ItemBody
+      })).body as SlackMessage
+
+      // most links have the preview and the the button
+      expect(response.attachments.length).toEqual(1)
+      expect(response.username.includes('MacSt')).toBeTruthy()
+    })
+
+    test('should post items with a re-parser', async () => {
+      const response = (await got(`${baseUrl}/item`, {
+        query: { api_key: process.env.API_KEY },
+        method: 'POST',
+        json: true,
+        body: {
+          url: 'https://www.factorio.com/blog/post/fff-269',
+          channel: testChannel,
+          re_parse: true
+        } as ItemBody
+      })).body as SlackMessage
+
+      // most the content and the the button
+      expect(response.attachments.length).toEqual(2)
+      expect(response.username.includes('Factorio')).toBeTruthy()
+    })
+
+    test('should post items with an identifier', async () => {
+      const response = (await got(`${baseUrl}/item`, {
+        query: { api_key: process.env.API_KEY },
+        method: 'POST',
+        json: true,
+        body: {
+          url:
+            'https://www.pbs.org/newshour/science/why-the-fattest-bear-is-the-picture-of-health',
+          channel: testChannel,
+          identifier: 'vicky_writing'
+        } as ItemBody
+      })).body as SlackMessage
+
+      // the button
+      expect(response.attachments.length).toEqual(1)
+      expect(response.username.includes('Vicky')).toBeTruthy()
+    })
+
+    test('should post items that fall back to a generic handler', async () => {
+      const response = (await got(`${baseUrl}/item`, {
+        query: { api_key: process.env.API_KEY },
+        method: 'POST',
+        json: true,
+        body: {
+          url:
+            'https://www.pbs.org/newshour/science/why-the-fattest-bear-is-the-picture-of-health',
+          channel: testChannel
+        } as ItemBody
+      })).body as SlackMessage
+
+      // the button
+      expect(response.attachments.length).toEqual(1)
+      expect(response.username.includes('Vicky')).toBeFalsy()
+    })
+
+    test('should post items with custom handlers', async () => {
       const response = (await got(`${baseUrl}/item`, {
         query: { api_key: process.env.API_KEY },
         method: 'POST',
@@ -63,10 +149,12 @@ describe('server', () => {
         body: {
           url: 'https://xkcd.com/2030/',
           channel: testChannel
-        }
-      })).body
+        } as ItemBody
+      })).body as SlackMessage
 
-      expect(response).toEqual({ ok: true })
+      // xkcd has the image, the subtext, and the button
+      expect(response.attachments.length).toEqual(3)
+      expect(response.username.includes('xkcd')).toBeTruthy()
     })
 
     test('should validate params', async () => {

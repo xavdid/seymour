@@ -4,6 +4,7 @@ import {
   ChatPostMessageArguments,
   MessageAttachment
 } from '@slack/client'
+import { SlackPostMessageResponse } from '../interfaces'
 
 export default class BaseHandler {
   // can this be made into an options object and still take advantage of the shorthand?
@@ -88,15 +89,12 @@ export default class BaseHandler {
     slackClient: WebClient,
     reParse: boolean
   ) {
-    // do things
     const opts = await this.slackOpts(url, reParse)
-    try {
-      const res = await slackClient.chat.postMessage({ channel, ...opts })
-      console.log(res)
-      return { ok: true }
-    } catch (e) {
-      console.log(e)
-      return { ok: false }
-    }
+
+    const response = (await slackClient.chat.postMessage({
+      channel,
+      ...opts
+    })) as SlackPostMessageResponse
+    return response.message
   }
 }

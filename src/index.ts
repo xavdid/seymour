@@ -47,10 +47,9 @@ export const listener = async (
       return
     }
 
-    // might await, but I don't think I need it
-    route.handler(reply, body)
+    // await so that errors bubble up here
+    await route.handler(reply, body)
   } catch (e) {
-    // this is for accidential things, not error handling
     reply({ message: e.message, trace: e.stack.split('\n') }, 500)
   }
 }

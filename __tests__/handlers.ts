@@ -7,16 +7,6 @@ import xkcdHandler from '../src/handlers/xkcd'
 import { rootDomain, fetchArticleData } from '../src/utils'
 
 describe('handlers', () => {
-  test('kickstarter handler', async () => {
-    const base = pickHandler(
-      'https://www.kickstarter.com/projects/882053899/the-name-of-the-wind-art-deck/posts/1990046'
-    )
-    const opts = await base.slackOpts(
-      'https://www.kickstarter.com/projects/882053899/the-name-of-the-wind-art-deck/posts/1990046'
-    )
-    expect(opts.icon_url.includes('kickstarter')).toBeTruthy()
-  })
-
   test('xkcd handler', async () => {
     const xkcd = new xkcdHandler()
     expect(xkcd.botName).toBeTruthy()
@@ -29,7 +19,7 @@ describe('handlers', () => {
     const url = 'https://www.youtube.com/watch?v=eeqb_vTkGeM'
     const basicYoutube = pickHandler(url)
     const opts = await basicYoutube.slackOpts(url)
-    expect(opts.username.includes('Youtube')).toBeTruthy()
+    expect(opts.username.includes('YouTube')).toBeTruthy()
   })
 
   test('crashcourse youtube handler', async () => {
