@@ -6,7 +6,7 @@ import { MessageAttachment } from '@slack/client'
 
 export default class extends BaseHandler {
   constructor() {
-    super('https://i.imgur.com/aHypqGZ.png', 'StackOverflow Bot')
+    super(undefined, 'StackOverflow Bot')
   }
 
   public async formatter(url: string): Promise<MessageAttachment[]> {

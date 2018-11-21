@@ -9,16 +9,10 @@ import AppShopperHandler from './appShopper'
 const handlers: { [domain: string]: { [identifier: string]: BaseHandler } } = {
   'appshopper.com': { _default: new AppShopperHandler() },
   'boardgamegeek.com': {
-    _default: new BaseHandler(
-      'https://i.imgur.com/R3qwQEJ.png',
-      'BoardGameGeek Bot'
-    )
+    _default: new BaseHandler(undefined, 'BoardGameGeek Bot')
   },
   'codinghorror.com': {
-    _default: new BaseHandler(
-      'https://i.imgur.com/8Dm4XWr.png',
-      'CodingHorror Bot'
-    )
+    _default: new BaseHandler(undefined, 'CodingHorror Bot')
   },
   'escapistmagazine.com': {
     _default: new BaseHandler(
@@ -37,19 +31,18 @@ const handlers: { [domain: string]: { [identifier: string]: BaseHandler } } = {
   },
   'kickstarter.com': {
     _default: new BaseHandler(
-      'https://www.kickstarter.com/download/kickstarter-logo-k-color.png'
+      // I prefer the dark logo to the fat white one
+      'https://i.imgur.com/1MKAeXw.png'
     )
   },
-  'macstories.net': {
-    _default: new BaseHandler('https://i.imgur.com/0NqKUfZ.png')
-  },
+  'macstories.net': { _default: new BaseHandler(undefined, 'MacStories Bot') },
   'mailchi.mp': {
     club_macstories: new BaseHandler(
       'https://i.imgur.com/v8SJ8jz.png',
       'Club Macstories Bot'
     )
   },
-  'pbs.org': { vicky_writing: new BaseHandler('', 'Vicky Bot') },
+  'pbs.org': { vicky_writing: new BaseHandler(undefined, 'Vicky Bot') },
   'reddit.com': {
     _default: new BaseHandler('https://i.imgur.com/JBSDcz8.png'),
     cfb: new BaseHandler('https://i.imgur.com/48nSd44.png', 'CFB Bot')
@@ -58,13 +51,16 @@ const handlers: { [domain: string]: { [identifier: string]: BaseHandler } } = {
     _default: new StackOverflowHandler()
   },
   'steamcommunity.com': {
-    slay_the_spire: new BaseHandler('', 'SlayTheSpire Bot')
+    slay_the_spire: new BaseHandler(
+      'https://i.imgur.com/KpKNPWk.png',
+      'SlayTheSpire Bot'
+    )
   },
   'xkcd.com': {
     _default: new xkcdHandler()
   },
   'youtube.com': {
-    _default: new BaseHandler('https://i.imgur.com/CnVgbNY.png'),
+    _default: new BaseHandler(undefined, 'YouTube Bot'),
     crash_course: new BaseHandler(
       'https://i.imgur.com/Ee5zivD.png',
       'CrashCouse Bot'
@@ -72,6 +68,10 @@ const handlers: { [domain: string]: { [identifier: string]: BaseHandler } } = {
     zero_punctuation: new BaseHandler(
       'https://i.imgur.com/KCtI84z.png',
       'ZeroPunctuation Bot'
+    ),
+    last_week_tonight: new BaseHandler(
+      'https://i.imgur.com/mu1U2SQ.png',
+      'LastWeekTonight Bot'
     )
   }
 }

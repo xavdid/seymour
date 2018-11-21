@@ -20,7 +20,7 @@ const parseAppshopperPrice = (s: string) => {
 
 export default class extends BaseHandler {
   constructor() {
-    super('https://i.imgur.com/gJz8r3f.png', 'AppShopper Bot')
+    super(undefined, 'AppShopper Bot')
   }
 
   public async formatter(url: string): Promise<MessageAttachment[]> {
