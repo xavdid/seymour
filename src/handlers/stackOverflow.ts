@@ -2,13 +2,14 @@ import * as got from 'got'
 import BaseHandler from './base'
 import * as striptags from 'striptags'
 import { StackExchangeResponse } from '../interfaces'
+import { MessageAttachment } from '@slack/client'
 
 export default class extends BaseHandler {
   constructor() {
     super('https://i.imgur.com/aHypqGZ.png', 'StackOverflow Bot')
   }
 
-  public async formatter(url: string) {
+  public async formatter(url: string): Promise<MessageAttachment[]> {
     const questionNum = url.split('/').filter(i => i)[3] // trailing slash is ok
     const response: StackExchangeResponse = (await got.get(
       `https://api.stackexchange.com/2.2/questions/${questionNum}`,

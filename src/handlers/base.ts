@@ -1,14 +1,13 @@
-import { botNamer, fetchArticleData, COLOR } from '../utils'
-import { WebClient, ChatPostMessageArguments } from '@slack/client'
-import { MessageAttachment } from '@slack/client'
+import { botNamer, fetchArticleData, COLOR, rootDomain } from '../utils'
+import {
+  WebClient,
+  ChatPostMessageArguments,
+  MessageAttachment
+} from '@slack/client'
 
 export default class BaseHandler {
   // can this be made into an options object and still take advantage of the shorthand?
-  constructor(
-    public icon?: string,
-    public botName?: string,
-    public identifier?: string
-  ) {}
+  constructor(public icon?: string, public botName?: string) {}
 
   // this gets subclassed
   // should return slack attachment array
@@ -32,10 +31,13 @@ export default class BaseHandler {
   }
 
   public async slackOpts(url: string, reParse?: boolean) {
-    const opts: { text: string } & Partial<ChatPostMessageArguments> = {
+    const opts: { text: string; username: string } & Partial<
+      ChatPostMessageArguments
+    > = {
       unfurl_links: true,
       unfurl_media: true,
-      text: url
+      text: url,
+      username: ''
     }
 
     if (this.icon) {
@@ -45,8 +47,8 @@ export default class BaseHandler {
         opts.icon_url = this.icon
       }
     } else {
-      // that api that gives the site logos for free (clearbit?)
-      // opts.icon_url = ''
+      // this is awesome
+      opts.icon_url = `https://logo.clearbit.com/${rootDomain(url)}`
     }
 
     opts.username = this.botName || botNamer(url)
@@ -64,16 +66,14 @@ export default class BaseHandler {
     // add button
     opts.attachments = opts.attachments.concat([
       {
-        // fallback: 'never seen',
-        // callback_id: 'comic_1234_xyz', // this doesn't matter?
+        fallback: 'never seen, but required',
+        callback_id: 'comic_1234_xyz', // content doesn't matter, but needs to be there
         color: COLOR,
-        // attachment_type: 'default',
         actions: [
           {
-            // name: 'read',
+            name: 'read',
             text: 'Mark as Read',
             type: 'button'
-            // value: 'read2'
           }
         ]
       }

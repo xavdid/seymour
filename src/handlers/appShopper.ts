@@ -1,3 +1,5 @@
+import { MessageAttachment } from '@slack/client'
+
 import BaseHandler from './base'
 import { fetchArticleData } from '../utils'
 
@@ -21,7 +23,7 @@ export default class extends BaseHandler {
     super('https://i.imgur.com/gJz8r3f.png', 'AppShopper Bot')
   }
 
-  public async formatter(url: string) {
+  public async formatter(url: string): Promise<MessageAttachment[]> {
     const articleData = await fetchArticleData(url)
     const { is, was } = parseAppshopperPrice(articleData.excerpt)
     // for some reason, appshopper comes out of mercury with the app image in the url spot

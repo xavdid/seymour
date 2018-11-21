@@ -1,8 +1,8 @@
 import { load } from 'dotenv'
 load()
 
-import xkcdHandler from '../src/handlers/xkcd'
 import { identifiersByDomain, pickHandler } from '../src/handlers'
+import xkcdHandler from '../src/handlers/xkcd'
 
 import { rootDomain, fetchArticleData } from '../src/utils'
 
