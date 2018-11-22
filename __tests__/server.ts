@@ -2,6 +2,7 @@ import { load } from 'dotenv'
 load()
 
 import * as got from 'got'
+import { isPlainObject, isArray } from 'lodash'
 import { start, stop } from '../src/server'
 import { SlackMessage, ItemBody } from '../src/interfaces'
 
@@ -28,9 +29,35 @@ describe('server', () => {
       json: true
     })).body
 
+    expect(isPlainObject(response)).toBeTruthy()
     expect(response['mailchi.mp']).toBeTruthy()
+    expect(response['youtube.com'].length).toBeGreaterThan(2)
     expect(response.blah).toBeUndefined()
     expect(Object.keys(response).length).toBeGreaterThan(3)
+  })
+
+  test('should fetch identifiers for a domain', async () => {
+    const response = (await got(`${baseUrl}/identifiers`, {
+      json: true,
+      query: {
+        url: 'https://www.youtube.com/watch?v=mephJf3-zYE'
+      }
+    })).body
+
+    expect(isArray(response)).toBeTruthy()
+    expect(response.length).toBeGreaterThan(2)
+    expect(response.includes('crash_course')).toBeTruthy()
+  })
+
+  test('should fail to find identifiers for an empty domain', async () => {
+    const response = (await got(`${baseUrl}/identifiers`, {
+      json: true,
+      query: {
+        url: 'blah'
+      }
+    })).body
+
+    expect(response).toEqual([])
   })
 
   describe('channels', () => {

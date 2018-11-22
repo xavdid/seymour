@@ -19,7 +19,9 @@ export const listener = async (
   try {
     const urlObj = urlParse(request.url!)
     const path = urlObj.pathname!
-    const apiKey = qsParse(urlObj.query!).api_key as string
+    const { api_key: apiKey, ...pathObj } = qsParse(urlObj.query!) as {
+      [x: string]: string
+    }
 
     let body
     if (request.method === 'POST') {
@@ -48,8 +50,11 @@ export const listener = async (
     }
 
     // await so that errors bubble up here
-    await route.handler(reply, body)
+    await route.handler(reply, pathObj, body)
   } catch (e) {
+    if (process.env.NODE_ENV === 'test') {
+      console.log(e)
+    }
     reply({ message: e.message, trace: e.stack.split('\n') }, 500)
   }
 }

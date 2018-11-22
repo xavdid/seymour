@@ -7,7 +7,7 @@
     "build": "tsc",
     "heroku-postbuild": "yarn build",
     "start": "node lib/server.js",
-    "test": "jest",
+    "test": "NODE_ENV=test jest",
     "lint": "tslint -p .",
     "posttest": "yarn lint",
     "fresh": "yarn clean && yarn lint && yarn build",
@@ -50,7 +50,9 @@
   },
   "jest": {
     "globals": {
-      "ts-jest": {"diagnostics": false}
+      "ts-jest": {
+        "diagnostics": false
+      }
     },
     "transform": {
       "^.+\\.tsx?$": "ts-jest"

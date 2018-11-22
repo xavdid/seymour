@@ -3,7 +3,7 @@ import { WebAPICallResult, MessageAttachment } from '@slack/client'
 export type replyFunc = (o: object, statusCode?: number) => void
 
 export interface Route {
-  handler: (reply: replyFunc, body?: object) => void
+  handler: (reply: replyFunc, path?: object, body?: object) => void
   protected?: boolean
   description: string
   requiredProperties?: string[]

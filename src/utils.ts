@@ -8,7 +8,7 @@ import { MercuryResponse } from './interfaces'
 
 export const COLOR = '#FEDE00' // seymour yellow
 
-export const validApiKey = (apiKey: string, reply: replyFunc) => {
+export const validApiKey = (apiKey: string | undefined, reply: replyFunc) => {
   if (!process.env.API_KEY) {
     reply({ message: 'env variables not loaded' }, 500)
     return false

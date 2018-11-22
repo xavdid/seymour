@@ -3,13 +3,21 @@ import { identifiersByDomain, pickHandler } from './handlers'
 import { WebClient } from '@slack/client'
 
 import { Route, ItemBody, SlackChannelResponse } from './interfaces'
+import { rootDomain } from './utils'
 
 const slackClient = new WebClient(process.env.SLACK_API_TOKEN)
 
 const routes: { [method: string]: { [path: string]: Route } } = {
   GET: {
     '/identifiers': {
-      handler: reply => reply(identifiersByDomain),
+      handler: (reply, { url }: { url?: string } = {}) => {
+        if (url) {
+          const domain = rootDomain(url)
+          reply(identifiersByDomain[domain] || [])
+        } else {
+          reply(identifiersByDomain)
+        }
+      },
       description:
         "mapping of domain to available identifiers. If a domain isn't listed (or you use a listed domain without an identifier), the default handler will be used"
     },
@@ -34,7 +42,7 @@ const routes: { [method: string]: { [path: string]: Route } } = {
     },
     '/item': {
       protected: true,
-      handler: async (reply, body) => {
+      handler: async (reply, pathObj, body) => {
         const itemBody = body as ItemBody
         const handler = pickHandler(itemBody.url, itemBody.identifier)
 
