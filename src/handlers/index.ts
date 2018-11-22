@@ -82,15 +82,15 @@ const handlers: { [domain: string]: { [identifier: string]: BaseHandler } } = {
 }
 
 // domains with identifiers
-// this would be better in a functional style
-
-export const identifiersByDomain: _.Dictionary<string[]> = _.fromPairs(_.filter(
-  _.map(handlers, (identifierMap, domain) => [
+const identifierPairs = _.chain(handlers)
+  .map((identifierMap, domain) => [
     domain,
     Object.keys(identifierMap).filter(k => !k.startsWith('_'))
-  ]),
-  ([domain, identifiers]) => identifiers.length
-) as Array<[string, string[]]>)
+  ])
+  .filter(([domain, identifiers]) => identifiers.length)
+  .value() as Array<[string, string[]]>
+
+export const identifiersByDomain = _.fromPairs(identifierPairs)
 
 export const pickHandler = (url: string, identifier?: string): BaseHandler => {
   const domain = rootDomain(url)
