@@ -77,7 +77,8 @@ const handlers: { [domain: string]: { [identifier: string]: BaseHandler } } = {
     last_week_tonight: new BaseHandler(
       'https://i.imgur.com/mu1U2SQ.png',
       'LastWeekTonight Bot'
-    )
+    ),
+    cgp_grey: new BaseHandler('https://i.imgur.com/9CxWy5T.png', 'CGP Grey Bot')
   }
 }
 
