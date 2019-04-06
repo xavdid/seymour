@@ -1,7 +1,7 @@
-import * as got from 'got'
-import BaseHandler from './base'
-import { XkcdResponse } from '../interfaces'
 import { MessageAttachment } from '@slack/client'
+import * as got from 'got'
+import { XkcdResponse } from '../interfaces'
+import BaseHandler from './base'
 
 export default class extends BaseHandler {
   constructor() {

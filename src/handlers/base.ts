@@ -1,10 +1,10 @@
-import { botNamer, fetchArticleData, COLOR, rootDomain } from '../utils'
 import {
-  WebClient,
   ChatPostMessageArguments,
-  MessageAttachment
+  MessageAttachment,
+  WebClient
 } from '@slack/client'
 import { SlackPostMessageResponse } from '../interfaces'
+import { botNamer, COLOR, fetchArticleData, rootDomain } from '../utils'
 
 export default class BaseHandler {
   // can this be made into an options object and still take advantage of the shorthand?

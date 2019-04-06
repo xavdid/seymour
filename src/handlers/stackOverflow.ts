@@ -1,8 +1,8 @@
+import { MessageAttachment } from '@slack/client'
 import * as got from 'got'
-import BaseHandler from './base'
 import * as striptags from 'striptags'
 import { StackExchangeResponse } from '../interfaces'
-import { MessageAttachment } from '@slack/client'
+import BaseHandler from './base'
 
 export default class extends BaseHandler {
   constructor() {

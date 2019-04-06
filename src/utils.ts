@@ -1,10 +1,10 @@
-import { difference, capitalize } from 'lodash'
-import { ItemBody, replyFunc } from './interfaces'
+import { parse } from '@postlight/mercury-parser'
+import * as got from 'got'
 import { ServerResponse } from 'http'
+import { capitalize, difference } from 'lodash'
 import * as parser from 'url-parse'
 
-import * as got from 'got'
-import { MercuryResponse } from './interfaces'
+import { ItemBody, replyFunc } from './interfaces'
 
 export const COLOR = '#FEDE00' // seymour yellow
 
@@ -59,13 +59,6 @@ export const botNamer = (url: string) => {
 }
 
 export const fetchArticleData = async (url: string) => {
-  const articleData: MercuryResponse = (await got(
-    'https://mercury.postlight.com/parser',
-    {
-      query: { url },
-      headers: { 'x-api-key': process.env.MERCURY_API_KEY },
-      json: true
-    }
-  )).body
+  const articleData = await parse(url)
   return articleData
 }

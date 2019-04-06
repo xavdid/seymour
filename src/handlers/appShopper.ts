@@ -1,7 +1,7 @@
 import { MessageAttachment } from '@slack/client'
 
-import BaseHandler from './base'
 import { fetchArticleData } from '../utils'
+import BaseHandler from './base'
 
 const parseAppshopperPrice = (s: string) => {
   const prices = s.match(/^\$?(free|\d+\.\d+) was \$?(free|\d+\.\d+)/i)

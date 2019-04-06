@@ -1,10 +1,10 @@
 import * as _ from 'lodash'
 import { rootDomain } from '../utils'
 
-import BaseHandler from './base'
-import xkcdHandler from './xkcd'
-import StackOverflowHandler from './stackOverflow'
 import AppShopperHandler from './appShopper'
+import BaseHandler from './base'
+import StackOverflowHandler from './stackOverflow'
+import xkcdHandler from './xkcd'
 
 const handlers: { [domain: string]: { [identifier: string]: BaseHandler } } = {
   'appshopper.com': { _default: new AppShopperHandler() },

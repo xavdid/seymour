@@ -1,8 +1,8 @@
-import { pick, pickBy } from 'lodash'
-import { identifiersByDomain, pickHandler } from './handlers'
 import { WebClient } from '@slack/client'
+import { pick, pickBy } from 'lodash'
 
-import { Route, ItemBody, SlackChannelResponse } from './interfaces'
+import { identifiersByDomain, pickHandler } from './handlers'
+import { ItemBody, Route, SlackChannelResponse } from './interfaces'
 import { rootDomain } from './utils'
 
 const slackClient = new WebClient(process.env.SLACK_API_TOKEN)

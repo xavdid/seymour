@@ -2,11 +2,11 @@ import { parse as qsParse } from 'querystring'
 import { parse as urlParse } from 'url'
 
 import { get } from 'lodash'
-import { validApiKey, validBody, respond } from './utils'
+import { respond, validApiKey, validBody } from './utils'
 
 import { IncomingMessage, ServerResponse } from 'http'
 import * as getRawBody from 'raw-body'
-import { Route, replyFunc } from './interfaces'
+import { replyFunc, Route } from './interfaces'
 
 import { routes } from './routes'
 

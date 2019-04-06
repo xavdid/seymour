@@ -1,4 +1,4 @@
-import { WebAPICallResult, MessageAttachment } from '@slack/client'
+import { MessageAttachment, WebAPICallResult } from '@slack/client'
 
 export type replyFunc = (o: object, statusCode?: number) => void
 
@@ -63,19 +63,6 @@ export interface SlackMessage {
 export interface SlackPostMessageResponse extends WebAPICallResult {
   channel: string
   message: SlackMessage
-}
-
-// https://mercury.postlight.com/web-parser/
-export interface MercuryResponse {
-  title: string
-  author?: string
-  content: string // html string
-  excerpt: string
-  date_published?: string
-  lead_image_url: string
-  url: string
-  // domain: string
-  word_count: number
 }
 
 export interface ItemBody {
